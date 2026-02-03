@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>건강·멘탈 관리 앱 - 데이터 완전 포함</title>
+<title>건강·멘탈 관리 앱 - AI 상담 업그레이드</title>
 <style>
 body { font-family: system-ui; margin:0; background: linear-gradient(135deg,#a1c4fd,#c2e9fb); color:#333; }
 .container { max-width:420px; margin:0 auto; padding:15px; }
@@ -18,15 +18,17 @@ input,select { width:100%; padding:8px;margin-top:5px;margin-bottom:5px;}
 .msg { margin-bottom:10px;}
 .user { font-weight:bold; color:#4f46e5;}
 .ai { font-weight:bold; color:#16a34a;}
+button.homeBtn { background:#4f46e5; color:white; margin-top:10px;}
 </style>
 </head>
 <body>
-<header>건강·멘탈 관리 앱</header>
+<header>건강·멘탈 관리 앱 - AI 상담 업그레이드</header>
 
 <div class="container">
   <div class="menu">
     <button onclick="showScreen('login')">로그인</button>
     <button onclick="showScreen('mental')">멘탈</button>
+    <button onclick="showScreen('sleep')">수면 기록</button>
     <button onclick="showScreen('food')">음식</button>
     <button onclick="showScreen('game')">미니게임</button>
     <button onclick="showScreen('chat')">AI 상담</button>
@@ -54,13 +56,23 @@ input,select { width:100%; padding:8px;margin-top:5px;margin-bottom:5px;}
       <button onclick="setMood('😐')">보통</button>
       <button onclick="setMood('😢')">나쁨</button>
       <p id="moodComment"></p>
+      <button class="homeBtn" onclick="showScreen('mental')">홈으로</button>
     </div>
+  </div>
+
+  <!-- 수면 -->
+  <div class="screen" id="sleep">
     <div class="card">
-      <h2>🌙 수면 시간</h2>
-      <select id="sleepPeriod"><option>오전</option><option>오후</option></select>
-      <input type="number" id="sleep" placeholder="시간 입력">
+      <h2>🌙 수면 기록</h2>
+      <label>자는 시간</label>
+      <input type="time" id="sleepStart">
+      <label>일어나는 시간</label>
+      <input type="time" id="sleepEnd">
+      <label>오전/오후</label>
+      <select id="sleepAMPM"><option>AM</option><option>PM</option></select>
       <button onclick="saveSleep()">저장</button>
       <p id="sleepLog"></p>
+      <button class="homeBtn" onclick="showScreen('mental')">홈으로</button>
     </div>
   </div>
 
@@ -70,6 +82,7 @@ input,select { width:100%; padding:8px;margin-top:5px;margin-bottom:5px;}
       <h2>🥗 오늘의 추천 음식</h2>
       <p id="foodDisplay"></p>
       <button onclick="pickFood()">새로 추천</button>
+      <button class="homeBtn" onclick="showScreen('mental')">홈으로</button>
     </div>
   </div>
 
@@ -82,6 +95,7 @@ input,select { width:100%; padding:8px;margin-top:5px;margin-bottom:5px;}
       <button onclick="submitGame()">제출</button>
       <p id="gameResult"></p>
       <button onclick="newGame()">다음 문제</button>
+      <button class="homeBtn" onclick="showScreen('mental')">홈으로</button>
     </div>
   </div>
 
@@ -92,75 +106,31 @@ input,select { width:100%; padding:8px;margin-top:5px;margin-bottom:5px;}
       <div id="chatBox"></div>
       <input type="text" id="userInput" placeholder="메시지 입력">
       <button onclick="sendMessage()">전송</button>
+      <button class="homeBtn" onclick="showScreen('mental')">홈으로</button>
     </div>
   </div>
-
 </div>
 
 <script>
-// ================= 실제 데이터 생성 (앱 스케일) =================
+// ======= 샘플 데이터 =======
+const foods=[]; for(let i=1;i<=5000;i++){foods.push("음식"+i);}
+const aiData=[]; for(let i=1;i<=2000;i++){aiData.push({k:["키워드"+i],r:["해결책 "+i]});}
+const games=[]; for(let i=1;i<=500;i++){games.push({q:"문제"+i,a:"정답"+i});}
 
-// 🍔 음식 5000개 생성
-const baseFoods = [
-"닭가슴살","계란","연어","두부","아몬드","호두","바나나","사과","오렌지",
-"브로콜리","시금치","고구마","오트밀","요거트","치즈","콩","귀리","망고",
-"파프리카","토마토","포도","블루베리","아보카도","키위","수박","멜론",
-"바질","시나몬","연근","버섯","아스파라거스","렌틸콩"
-];
-let foods=[];
-for(let i=0;i<5000;i++){
-  let f = baseFoods[i%baseFoods.length];
-  foods.push({cat:"영양식", name:`${f} ${Math.floor(i/baseFoods.length)+1}`});
-}
+// ======= 상태 =======
+let currentGame={},currentUser=null,chatHistory=[];
+let moodComments={"😄":["좋아요! 멋진 하루예요 😄","행복한 기운이 느껴져요!"],
+                 "😐":["보통이네요. 천천히 가도 괜찮아요.","균형 잡힌 하루 보내요!"],
+                 "😢":["힘들어도 잘 하고 있어요.","조금 쉬어도 괜찮아요."]};
 
-// 🧠 AI 키워드 2000개 생성
-const baseKeywords=[
-"힘들","스트레스","우울","슬퍼","불안","피곤","졸려","불면","집중","공부",
-"목마름","배고파","체중","운동","다이어트","식단","근육","통증","두통",
-"불안감","긴장","초조","화남","짜증","부담","걱정","우울감","열심","낙담",
-"목표","성취","휴식","휴가","편안","편안함"
-];
-let aiData=[];
-for(let i=0;i<2000;i++){
-  let k = baseKeywords[i%baseKeywords.length];
-  aiData.push({k:[k], r:[
-    `저는 ${k} 때문에 고민이신가요? 천천히 숨을 쉬어보세요.`,
-    `${k}을 느낄 때는 짧은 산책이나 휴식이 도움이 됩니다.`,
-    `${k} 상태라면 가벼운 스트레칭을 해보세요.`
-  ]});
-}
-
-// 🎯 미니게임 500개 생성
-const baseGameQ=[
-  {q:"하루 권장 물 섭취량은?",a:"2L"},
-  {q:"하루 권장 수면 시간은?",a:"8"},
-  {q:"스트레칭 권장 시간은?",a:"10"},
-  {q:"아침 식사로 좋은 단백질?",a:"계란"},
-  {q:"쉬운 유산소 운동은?",a:"걷기"},
-  {q:"심호흡 권장 횟수?",a:"5"}
-];
-let games=[];
-for(let i=0;i<500;i++){
-  let g = baseGameQ[i%baseGameQ.length];
-  games.push({q:`${g.q} (${i+1})`, a:g.a});
-}
-
-// ================= 변수 =================
-let currentGame={};
-let currentUser=null;
-let moodComments={
-  "😄":["좋아요! 멋진 하루예요 😄","행복한 기운이 느껴져요!"],
-  "😐":["보통이네요. 천천히 가도 괜찮아요.","균형 잡힌 하루 보내요!"],
-  "😢":["힘들어도 잘 하고 있어요.","조금 쉬어도 괜찮아요."]
-};
-
-// ================= 화면 전환 =================
+// ======= 화면 전환 =======
 function showScreen(id){
+  if(!currentUser && id!=="login"){alert("로그인 필요!"); return;}
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-// ================= 회원 =================
+// ======= 회원 =======
 function signup(){
   let name=document.getElementById("username").value;
   let age=document.getElementById("age").value;
@@ -180,74 +150,68 @@ function login(){
   if(users[name]&&users[name].password===pw){
     currentUser={name:name,age:users[name].age};
     document.getElementById("loginMsg").textContent=`환영합니다, ${name}님!`;
-    showScreen("mental");
-    loadUserData();
+    showScreen("mental"); loadUserData();
   } else {document.getElementById("loginMsg").textContent="로그인 실패";}
 }
 
 function logout(){currentUser=null; showScreen("login");}
 
-// ================= 멘탈 =================
+// ======= 멘탈 =======
 function setMood(m){
   document.getElementById("moodComment").textContent=moodComments[m][Math.floor(Math.random()*moodComments[m].length)];
-  if(currentUser){
-    let d=JSON.parse(localStorage.getItem("userData")||"{}");
-    if(!d[currentUser.name])d[currentUser.name]={};
-    d[currentUser.name].mood=m;
-    localStorage.setItem("userData",JSON.stringify(d));
-  }
+  if(currentUser){let d=JSON.parse(localStorage.getItem("userData")||"{}"); if(!d[currentUser.name])d[currentUser.name]={}; d[currentUser.name].mood=m; localStorage.setItem("userData",JSON.stringify(d));}
 }
 
-// ================= 수면 =================
+// ======= 수면 =======
 function saveSleep(){
-  let s=document.getElementById("sleep").value;
-  let p=document.getElementById("sleepPeriod").value;
+  let start=document.getElementById("sleepStart").value;
+  let end=document.getElementById("sleepEnd").value;
+  let ampm=document.getElementById("sleepAMPM").value;
   if(!currentUser){alert("로그인 필요");return;}
-  if(!s){alert("시간을 입력해주세요");return;}
+  if(!start||!end){alert("시간 입력!"); return;}
   let d=JSON.parse(localStorage.getItem("userData")||"{}"); if(!d[currentUser.name])d[currentUser.name]={};
-  d[currentUser.name].sleep=`${p} ${s}시간`;
+  d[currentUser.name].sleep=`${start} ~ ${end} ${ampm}`;
   localStorage.setItem("userData",JSON.stringify(d));
-  document.getElementById("sleepLog").textContent=`최근 기록: ${p} ${s}시간`;
+  document.getElementById("sleepLog").textContent=`최근 기록: ${d[currentUser.name].sleep}`;
 }
 
 function loadUserData(){
   let d=JSON.parse(localStorage.getItem("userData")||"{}");
-  if(d[currentUser.name] && d[currentUser.name].sleep){
-    document.getElementById("sleepLog").textContent=`최근 기록: ${d[currentUser.name].sleep}`;
-  }
+  if(d[currentUser.name] && d[currentUser.name].sleep){document.getElementById("sleepLog").textContent=`최근 기록: ${d[currentUser.name].sleep}`;}
 }
 
-// ================= 음식 =================
-function pickFood(){ if(!foods.length)return;
-  let f=foods[Math.floor(Math.random()*foods.length)];
-  document.getElementById("foodDisplay").textContent=`${f.cat}: ${f.name}`;
-}
+// ======= 음식 =======
+function pickFood(){ let f=foods[Math.floor(Math.random()*foods.length)]; document.getElementById("foodDisplay").textContent=`오늘 추천: ${f}`; }
 
-// ================= 미니게임 =================
-function newGame(){ if(!games.length)return;
-  currentGame=games[Math.floor(Math.random()*games.length)];
-  document.getElementById("gameQ").textContent=currentGame.q;
-  document.getElementById("gameAns").value="";
-  document.getElementById("gameResult").textContent="";
-}
+// ======= 미니게임 =======
+function newGame(){ currentGame=games[Math.floor(Math.random()*games.length)]; document.getElementById("gameQ").textContent=currentGame.q; document.getElementById("gameAns").value=""; document.getElementById("gameResult").textContent="";}
+function submitGame(){ let ans=document.getElementById("gameAns").value.trim(); if(ans===currentGame.a){document.getElementById("gameResult").textContent="✅ 정답!";} else {document.getElementById("gameResult").textContent=`❌ 오답! 정답: ${currentGame.a}`;}}
 
-function submitGame(){
-  let ans=document.getElementById("gameAns").value.trim();
-  if(ans===currentGame.a){document.getElementById("gameResult").textContent="✅ 정답!";} 
-  else {document.getElementById("gameResult").textContent=`❌ 오답! 정답: ${currentGame.a}`;}
-}
-
-// ================= AI 상담 =================
+// ======= AI 상담 =======
 function sendMessage(){
   let input=document.getElementById("userInput").value.trim(); if(!input)return;
   addChat("user",input); document.getElementById("userInput").value="";
+  chatHistory.push({from:"user",msg:input});
+
+  // 문맥 기반 + 멘탈 반영
   let reply="죄송해요, 이해 못했어요 🙏";
-  for(let item of aiData){
-    if(item.k.some(kw=>input.includes(kw))){
-      reply=item.r[Math.floor(Math.random()*item.r.length)]; break;
+  if(currentUser){
+    let d=JSON.parse(localStorage.getItem("userData")||"{}");
+    let mood=d[currentUser.name]?.mood || "😐";
+    for(let item of aiData){
+      if(item.k.some(kw=>input.includes(kw))){
+        reply=item.r[Math.floor(Math.random()*item.r.length)];
+        break;
+      }
     }
+    if(/안녕|하이|hello/i.test(input)){reply="안녕하세요! 오늘 기분은 어떠신가요?";}
+    // 멘탈 상태에 맞춰 추가 공감
+    if(mood==="😢") reply="조금 힘든가보네요. 천천히 호흡하고 자신에게 여유를 주세요.";
+    else if(mood==="😐") reply+=" 균형 잡힌 하루를 보내고 있네요!";
+    else if(mood==="😄") reply+=" 오늘도 활기차게 보내고 있네요!";
   }
   addChat("ai",reply);
+  chatHistory.push({from:"ai",msg:reply});
 }
 
 function addChat(type,text){
@@ -257,11 +221,11 @@ function addChat(type,text){
   chat.appendChild(div); chat.scrollTop=chat.scrollHeight;
 }
 
-// 초기
+// 초기 화면
 showScreen("login");
+newGame();
 </script>
 </body>
 </html>
-
 
 <!-- deploy test -->
