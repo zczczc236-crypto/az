@@ -5,58 +5,91 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>멘탈·건강 관리</title>
 <style>
-body {
+body{
   font-family: system-ui;
-  background:#f4f6fb;
+  background:linear-gradient(180deg,#eef2ff,#f9fafe);
   margin:0;
   padding:15px;
 }
-.card {
+.card{
   background:white;
-  border-radius:16px;
-  padding:15px;
+  border-radius:18px;
+  padding:16px;
   margin-bottom:15px;
-  box-shadow:0 6px 15px rgba(0,0,0,.08);
+  box-shadow:0 8px 20px rgba(0,0,0,.08);
 }
-h2 { margin-top:0 }
-button {
+h2{margin:0 0 10px}
+button{
   padding:8px 12px;
   border:none;
-  border-radius:10px;
-  background:#4f7cff;
+  border-radius:12px;
+  background:#5a7cff;
   color:white;
-}
-input {
+  margin:4px 2px;
   width:100%;
-  padding:8px;
-  margin-top:5px;
 }
-.character {
-  font-size:60px;
+input{
+  width:100%;
+  padding:9px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  box-sizing:border-box;
+}
+.character{
+  font-size:64px;
   text-align:center;
+  transition:.3s;
 }
+.small{font-size:13px;color:#666}
+
+/* 채팅 */
+.chat-box{
+  height:190px;
+  overflow-y:auto;
+  background:#f3f5fb;
+  border-radius:12px;
+  padding:10px;
+  font-size:14px;
+}
+.chat-user{text-align:right;margin:6px 0}
+.chat-ai{text-align:left;margin:6px 0;color:#333}
 </style>
 </head>
+
 <body>
 
+<!-- 회원 -->
+<div class="card" id="loginCard">
+  <h2>👤 회원</h2>
+  <input id="username" placeholder="닉네임 입력">
+  <button onclick="login()">로그인 / 가입</button>
+  <p class="small" id="loginMsg"></p>
+</div>
+
+<!-- 캐릭터 -->
 <div class="card">
 <h2>🧍 내 캐릭터</h2>
 <div class="character" id="char">😐</div>
+<p class="small" id="charState"></p>
 </div>
 
+<!-- 멘탈 -->
 <div class="card">
 <h2>🧠 오늘 멘탈</h2>
-<button onclick="setMood('😄')">좋음</button>
-<button onclick="setMood('😐')">보통</button>
-<button onclick="setMood('😢')">나쁨</button>
+<button onclick="setMood('😄','좋음')">좋음</button>
+<button onclick="setMood('😐','보통')">보통</button>
+<button onclick="setMood('😢','나쁨')">나쁨</button>
 </div>
 
+<!-- 수면 -->
 <div class="card">
 <h2>🌙 수면 시간</h2>
 <input type="number" id="sleep" placeholder="수면 시간 (시간)">
 <button onclick="saveSleep()">저장</button>
+<p class="small" id="sleepMsg"></p>
 </div>
 
+<!-- 가계부 -->
 <div class="card">
 <h2>💰 가계부</h2>
 <input type="number" step="0.01" id="money" placeholder="금액 (소숫점 가능)">
@@ -64,47 +97,134 @@ input {
 <p id="moneyLog"></p>
 </div>
 
+<!-- 음식 추천 -->
 <div class="card">
 <h2>🥗 오늘의 추천 음식</h2>
 <p id="food"></p>
 </div>
 
+<!-- 미니게임 -->
 <div class="card">
 <h2>🎮 미니 게임</h2>
-<p>Q. 하루 물 권장 섭취량은?</p>
-<button onclick="alert('정답! 하루 약 1.5~2L')">2L</button>
-<button onclick="alert('아쉬워요!')">0.5L</button>
+<p>Q. 스트레스 완화에 도움 되는 건?</p>
+<button onclick="game(true)">산책</button>
+<button onclick="game(false)">밤샘</button>
+<p id="gameMsg" class="small"></p>
+</div>
+
+<!-- 대화 -->
+<div class="card">
+<h2>🗨️ 멘탈 케어 대화</h2>
+<div class="chat-box" id="chatBox"></div>
+<input id="chatInput" placeholder="지금 상태를 말해줘">
+<button onclick="sendChat()">보내기</button>
 </div>
 
 <script>
-const char = document.getElementById("char");
-const foodList = ["닭가슴살", "계란", "바나나", "고구마", "요거트"];
+// 기본 변수
+const char=document.getElementById("char");
+const charState=document.getElementById("charState");
+const chatBox=document.getElementById("chatBox");
+const foodList=["고구마","계란","요거트","바나나","연어"];
 
-function setMood(m) {
-  char.textContent = m;
-  localStorage.setItem("mood", m);
+let memory=JSON.parse(localStorage.getItem("chatMemory")||"[]");
+let currentUser=localStorage.getItem("currentUser");
+
+// 회원 기능
+function login(){
+  const name=document.getElementById("username").value.trim();
+  if(!name){document.getElementById("loginMsg").textContent="닉네임을 입력!";return;}
+  currentUser=name;
+  localStorage.setItem("currentUser",name);
+  if(!localStorage.getItem(name)){
+    localStorage.setItem(name,JSON.stringify({
+      mood:"😐",sleep:"",money:"",chat:[]
+    }));
+  }
+  document.getElementById("loginMsg").textContent=name+" 님 환영!";
+  loadUser();
 }
 
-function saveSleep() {
-  const s = document.getElementById("sleep").value;
-  localStorage.setItem("sleep", s);
-  alert("저장됨!");
+function loadUser(){
+  if(!currentUser) return;
+  const data=JSON.parse(localStorage.getItem(currentUser));
+  char.textContent=data.mood||"😐";
+  document.getElementById("moneyLog").textContent=data.money?"최근 기록: "+data.money+"원":"";
 }
 
-function saveMoney() {
-  const m = document.getElementById("money").value;
-  localStorage.setItem("money", m);
-  document.getElementById("moneyLog").textContent = "최근 지출: " + m;
+// 멘탈
+function setMood(emoji,text){
+  if(!currentUser){alert("로그인 먼저!");return;}
+  const data=JSON.parse(localStorage.getItem(currentUser));
+  char.textContent=emoji;
+  charState.textContent="현재 상태: "+text;
+  data.mood=emoji;
+  localStorage.setItem(currentUser,JSON.stringify(data));
 }
 
-document.getElementById("food").textContent =
-  foodList[Math.floor(Math.random() * foodList.length)];
+// 수면
+function saveSleep(){
+  if(!currentUser){alert("로그인 먼저!");return;}
+  const s=document.getElementById("sleep").value;
+  const data=JSON.parse(localStorage.getItem(currentUser));
+  data.sleep=s;
+  localStorage.setItem(currentUser,JSON.stringify(data));
+  document.getElementById("sleepMsg").textContent=s<6?"수면 부족 😵":"잘 자고 있어 👍";
+}
 
-char.textContent = localStorage.getItem("mood") || "😐";
-document.getElementById("moneyLog").textContent =
-  localStorage.getItem("money") ? "최근 지출: " + localStorage.getItem("money") : "";
+// 가계부
+function saveMoney(){
+  if(!currentUser){alert("로그인 먼저!");return;}
+  const m=document.getElementById("money").value;
+  const data=JSON.parse(localStorage.getItem(currentUser));
+  data.money=m;
+  localStorage.setItem(currentUser,JSON.stringify(data));
+  document.getElementById("moneyLog").textContent="최근 기록: "+m+"원";
+}
+
+// 음식 추천
+document.getElementById("food").textContent=
+  foodList[Math.floor(Math.random()*foodList.length)];
+
+// 미니게임
+function game(ok){
+  document.getElementById("gameMsg").textContent=
+    ok?"정답! 멘탈 회복 +1":"아쉬워요… 멘탈 -1";
+}
+
+// 대화
+function sendChat(){
+  const input=document.getElementById("chatInput");
+  const msg=input.value.trim();
+  if(!msg){return;}
+  if(!currentUser){alert("로그인 먼저!");return;}
+  addChat("🙂",msg,"chat-user");
+  input.value="";
+  setTimeout(()=>reply(msg),500);
+}
+
+function addChat(icon,text,cls){
+  chatBox.innerHTML+=`<div class="${cls}">${icon} ${text}</div>`;
+  chatBox.scrollTop=chatBox.scrollHeight;
+}
+
+function reply(msg){
+  let r="응, 계속 말해줘.";
+  if(msg.includes("힘들")){r="그만큼 버텨온 네가 대단해.";char.textContent="😢";}
+  else if(msg.includes("불안")){r="지금은 안전해. 숨 천천히.";char.textContent="😟";}
+  else if(msg.includes("행복")){r="그 감정 오래 기억하자 😊";char.textContent="😄";}
+  else if(msg.includes("졸려")){r="오늘은 일찍 쉬자.";char.textContent="🥱";}
+  addChat("🤍",r,"chat-ai");
+  const data=JSON.parse(localStorage.getItem(currentUser));
+  data.chat.push({u:msg,a:r});
+  localStorage.setItem(currentUser,JSON.stringify(data));
+  memory.push({u:msg,a:r});
+  localStorage.setItem("chatMemory",JSON.stringify(memory));
+}
+
+// 자동 로그인
+if(currentUser){loadUser();}
 </script>
-
 </body>
 </html>
 
