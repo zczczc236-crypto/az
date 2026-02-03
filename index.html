@@ -1,2159 +1,273 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#6366f1">
-<meta name="description" content="AI 기반 건강 & 멘탈 케어 파트너">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>마음 챙김 & 건강 파트너 Pro</title>
-<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoi66eI7J2M7LGE6rmA7ZSEIO2MjO2KuOuEiCIsInNob3J0X25hbWUiOiLqsbTqsJXsvIAiLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiI2ZmZmZmZiIsInRoZW1lX2NvbG9yIjoiIzYzNjZmMSIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSGRwWkhSb1BTSXlOVFlpSUdobGFXZG9kRDBpTWpVMklqNDhjbVZqZENCM2FXUjBhRDBpTWpVMklpQm9aV2xuYUhROUlqSTFOaUlnWm1sc2JEMGlJell6TmpabU1TSXZQand2YzNablBnPT0iLCJzaXplcyI6IjI1NngyNTYiLCJ0eXBlIjoiaW1hZ2Uvc3ZnK3htbCJ9XX0=">
-<style>
-:root {
-  --primary: #6366f1;
-  --primary-dark: #4f46e5;
-  --accent: #10b981;
-  --accent-dark: #059669;
-  --danger: #ef4444;
-  --danger-dark: #dc2626;
-  --warning: #f59e0b;
-  --bg: #f9fafb;
-  --bg-dark: #111827;
-  --card: #ffffff;
-  --card-dark: #1f2937;
-  --text: #1f2937;
-  --text-dark: #f9fafb;
-  --text-muted: #6b7280;
-  --text-muted-dark: #9ca3af;
-  --border: #e5e7eb;
-  --border-dark: #374151;
-  --shadow: rgba(0, 0, 0, 0.1);
-  --shadow-dark: rgba(0, 0, 0, 0.3);
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-[data-theme="dark"] {
-  --bg: var(--bg-dark);
-  --card: var(--card-dark);
-  --text: var(--text-dark);
-  --text-muted: var(--text-muted-dark);
-  --border: var(--border-dark);
-  --shadow: var(--shadow-dark);
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", "Malgun Gothic", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-  transition: var(--transition);
-}
-
-.app-container {
-  max-width: 480px;
-  margin: 0 auto;
-  min-height: 100vh;
-  background: var(--card);
-  box-shadow: 0 0 40px var(--shadow);
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
-
-/* Header */
-header {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  color: white;
-  padding: 20px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-header h1 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  flex: 1;
-}
-
-.theme-toggle {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  color: white;
-  font-size: 1.5rem;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: var(--transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.theme-toggle:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.1);
-}
-
-/* Screens */
-.screen {
-  display: none;
-  padding: 20px;
-  padding-bottom: 100px;
-  flex: 1;
-  overflow-y: auto;
-  animation: fadeIn 0.3s ease-in;
-}
-
-.screen.active {
-  display: block;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Cards */
-.card {
-  background: var(--card);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 8px var(--shadow);
-  border: 1px solid var(--border);
-  transition: var(--transition);
-}
-
-.card:hover {
-  box-shadow: 0 4px 16px var(--shadow);
-  transform: translateY(-2px);
-}
-
-.card h2 {
-  font-size: 1.25rem;
-  margin-bottom: 12px;
-  color: var(--text);
-}
-
-.card h3 {
-  font-size: 1.1rem;
-  margin-bottom: 10px;
-  color: var(--text);
-}
-
-/* Buttons */
-.btn {
-  width: 100%;
-  padding: 14px 20px;
-  border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: var(--transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-}
-
-.btn-secondary {
-  background: var(--bg);
-  color: var(--primary);
-  border: 2px solid var(--primary);
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background: var(--primary);
-  color: white;
-}
-
-.btn-danger {
-  background: linear-gradient(135deg, var(--danger) 0%, var(--danger-dark) 100%);
-  color: white;
-}
-
-.btn-danger:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-}
-
-.btn-accent {
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-  color: white;
-}
-
-.btn-accent:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-group {
-  display: flex;
-  gap: 10px;
-}
-
-.btn-group .btn {
-  flex: 1;
-}
-
-/* Inputs */
-input, select, textarea {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid var(--border);
-  border-radius: 10px;
-  font-size: 1rem;
-  background: var(--card);
-  color: var(--text);
-  transition: var(--transition);
-  font-family: inherit;
-}
-
-input:focus, select:focus, textarea:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
-
-.input-group {
-  margin-bottom: 12px;
-}
-
-.input-group label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-/* Mood Grid */
-.mood-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.mood-btn {
-  background: var(--bg);
-  border: 3px solid var(--border);
-  border-radius: 16px;
-  padding: 20px;
-  font-size: 2.5rem;
-  cursor: pointer;
-  transition: var(--transition);
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.mood-btn:hover {
-  transform: scale(1.1);
-  border-color: var(--primary);
-  box-shadow: 0 4px 12px var(--shadow);
-}
-
-.mood-btn:active {
-  transform: scale(0.95);
-}
-
-/* Chat */
-.chat-container {
-  height: calc(100vh - 280px);
-  display: flex;
-  flex-direction: column;
-}
-
-.chat-history {
-  flex: 1;
-  overflow-y: auto;
-  background: var(--bg);
-  border-radius: 12px;
-  padding: 16px;
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  scroll-behavior: smooth;
-}
-
-.chat-message {
-  max-width: 80%;
-  padding: 12px 16px;
-  border-radius: 16px;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  word-wrap: break-word;
-  animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.chat-message.user {
-  align-self: flex-end;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  color: white;
-  border-bottom-right-radius: 4px;
-}
-
-.chat-message.ai {
-  align-self: flex-start;
-  background: var(--card);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-bottom-left-radius: 4px;
-}
-
-.chat-message.system {
-  align-self: center;
-  background: var(--warning);
-  color: white;
-  font-size: 0.85rem;
-  max-width: 90%;
-  text-align: center;
-}
-
-.chat-input-container {
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.chat-input-container input {
-  flex: 1;
-}
-
-.chat-input-container .btn {
-  width: auto;
-  padding: 12px 20px;
-}
-
-.typing-indicator {
-  display: none;
-  align-items: center;
-  gap: 4px;
-  padding: 12px 16px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  width: fit-content;
-}
-
-.typing-indicator.active {
-  display: flex;
-}
-
-.typing-dot {
-  width: 8px;
-  height: 8px;
-  background: var(--text-muted);
-  border-radius: 50%;
-  animation: typing 1.4s infinite;
-}
-
-.typing-dot:nth-child(2) { animation-delay: 0.2s; }
-.typing-dot:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes typing {
-  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-  30% { transform: translateY(-8px); opacity: 1; }
-}
-
-/* Bottom Nav */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--card);
-  border-top: 1px solid var(--border);
-  display: none;
-  justify-content: space-around;
-  padding: 8px 0;
-  max-width: 480px;
-  margin: 0 auto;
-  z-index: 99;
-  box-shadow: 0 -4px 12px var(--shadow);
-}
-
-.bottom-nav.active {
-  display: flex;
-}
-
-.nav-btn {
-  border: none;
-  background: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 12px;
-  transition: var(--transition);
-  flex: 1;
-  max-width: 80px;
-}
-
-.nav-btn span {
-  font-size: 1.5rem;
-  margin-bottom: 4px;
-}
-
-.nav-btn.active {
-  color: var(--primary);
-  background: rgba(99, 102, 241, 0.1);
-}
-
-.nav-btn:hover {
-  background: rgba(99, 102, 241, 0.05);
-}
-
-/* Stats */
-.stat-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-top: 12px;
-}
-
-.stat-card {
-  background: var(--bg);
-  padding: 16px;
-  border-radius: 12px;
-  text-align: center;
-  border: 1px solid var(--border);
-}
-
-.stat-value {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--primary);
-  margin-bottom: 4px;
-}
-
-.stat-label {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-/* Chart */
-.chart-container {
-  margin-top: 16px;
-  background: var(--bg);
-  padding: 16px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-}
-
-canvas {
-  max-width: 100%;
-  height: auto;
-}
-
-/* Utility */
-.hidden { display: none !important; }
-.text-center { text-align: center; }
-.text-muted { color: var(--text-muted); font-size: 0.9rem; }
-.text-small { font-size: 0.85rem; }
-.mb-1 { margin-bottom: 8px; }
-.mb-2 { margin-bottom: 16px; }
-.mt-1 { margin-top: 8px; }
-.mt-2 { margin-top: 16px; }
-.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
-
-/* Loading */
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid var(--border);
-  border-top-color: var(--primary);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 20px auto;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Notifications */
-.notification {
-  position: fixed;
-  top: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--card);
-  color: var(--text);
-  padding: 16px 24px;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px var(--shadow);
-  border: 1px solid var(--border);
-  z-index: 1000;
-  max-width: 90%;
-  animation: slideDown 0.3s ease-out;
-  display: none;
-}
-
-.notification.active {
-  display: block;
-}
-
-.notification.success {
-  border-left: 4px solid var(--accent);
-}
-
-.notification.error {
-  border-left: 4px solid var(--danger);
-}
-
-.notification.warning {
-  border-left: 4px solid var(--warning);
-}
-
-@keyframes slideDown {
-  from { opacity: 0; transform: translate(-50%, -20px); }
-  to { opacity: 1; transform: translate(-50%, 0); }
-}
-
-/* Progress Bar */
-.progress-bar {
-  width: 100%;
-  height: 8px;
-  background: var(--border);
-  border-radius: 4px;
-  overflow: hidden;
-  margin: 8px 0;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--accent));
-  border-radius: 4px;
-  transition: width 0.3s ease;
-}
-
-/* Badge */
-.badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: var(--primary);
-  color: white;
-}
-
-.badge.accent { background: var(--accent); }
-.badge.danger { background: var(--danger); }
-.badge.warning { background: var(--warning); }
-
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
-}
-
-/* Responsive */
-@media (max-width: 480px) {
-  .app-container {
-    box-shadow: none;
-  }
-  
-  .card {
-    border-radius: 12px;
-  }
-  
-  .mood-grid {
-    gap: 8px;
-  }
-  
-  .mood-btn {
-    padding: 16px;
-    font-size: 2rem;
-  }
-}
-
-/* Accessibility */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-
-/* Focus visible */
-*:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-/* Animations */
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-.pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Export/Import */
-.file-input-wrapper {
-  position: relative;
-  overflow: hidden;
-  display: inline-block;
-  width: 100%;
-}
-
-.file-input-wrapper input[type=file] {
-  position: absolute;
-  left: -9999px;
-}
-
-.file-input-label {
-  display: block;
-  padding: 14px 20px;
-  background: var(--bg);
-  color: var(--primary);
-  border: 2px solid var(--primary);
-  border-radius: 12px;
-  text-align: center;
-  cursor: pointer;
-  transition: var(--transition);
-  font-weight: 600;
-}
-
-.file-input-label:hover {
-  background: var(--primary);
-  color: white;
-}
-
-/* Time Input */
-.time-input-group {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.time-input-group label {
-  min-width: 60px;
-  font-weight: 600;
-}
-
-.time-input-group input {
-  flex: 1;
-}
-
-.time-input-group select {
-  width: auto;
-  min-width: 80px;
-}
-
-/* List */
-.list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.list-item {
-  padding: 12px;
-  border-bottom: 1px solid var(--border);
-  transition: var(--transition);
-}
-
-.list-item:last-child {
-  border-bottom: none;
-}
-
-.list-item:hover {
-  background: var(--bg);
-}
-
-/* Food recommendation animation */
-.food-result {
-  background: var(--bg);
-  padding: 20px;
-  border-radius: 12px;
-  text-align: center;
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--primary);
-  min-height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition);
-}
-
-.food-result.animating {
-  animation: foodPulse 0.5s ease-in-out;
-}
-
-@keyframes foodPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-</style>
+  <meta charset="UTF-8">
+  <title>무료 웹 앱: 음식 추천, AI 상담, 건강 퀴즈</title>
+  <style>
+    /* 전역 스타일 및 폰트 설정 */
+    body {
+      font-family: '맑은 고딕', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      color: #333;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    /* 다크모드 스타일 */
+    body.dark {
+      background-color: #333;
+      color: #f4f4f4;
+    }
+    header {
+      background-color: #008080;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 10px;
+    }
+    /* 버튼 스타일 */
+    button, input[type="button"] {
+      padding: 10px 15px;
+      margin: 5px;
+      border: none;
+      background-color: #008080;
+      color: #fff;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    button:hover, input[type="button"]:hover {
+      background-color: #006666;
+    }
+    /* 폼 요소 스타일 */
+    select, input[type="text"] {
+      padding: 8px;
+      margin: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 80%;
+      max-width: 300px;
+    }
+    /* 섹션 구분 */
+    section {
+      border: 1px solid #ddd;
+      background-color: #fff;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    /* 다크모드 섹션 배경 */
+    body.dark section {
+      background-color: #555;
+      border-color: #666;
+    }
+    /* 반응형 디자인 */
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+      }
+      button, select, input[type="text"] {
+        width: 90%;
+      }
+    }
+    /* 추가 UI 요소: 토글박스 스타일 */
+    .toggle-container {
+      margin: 10px 0;
+    }
+  </style>
 </head>
 <body>
-<div class="app-container">
   <header>
-    <h1 id="headerTitle">마음 챙김 & 건강 파트너 Pro</h1>
-    <button class="theme-toggle" onclick="app.toggleTheme()" aria-label="테마 전환">
-      <span id="themeIcon">🌙</span>
-    </button>
+    <h1>무료 웹 앱: 음식 추천, AI 감정 상담, 건강 퀴즈</h1>
   </header>
-
-  <!-- LOGIN SCREEN -->
-  <div id="screen-login" class="screen active">
-    <div class="card text-center" style="margin-top: 60px;">
-      <div style="font-size: 4rem; margin-bottom: 16px;">🧘</div>
-      <h2>환영합니다</h2>
-      <p class="text-muted mb-2">AI와 함께하는 건강한 몸과 마음</p>
-
-      <div id="loginBox">
-        <div class="input-group">
-          <input id="loginId" type="text" placeholder="아이디" autocomplete="username">
-        </div>
-        <div class="input-group">
-          <input id="loginPw" type="password" placeholder="비밀번호" autocomplete="current-password">
-        </div>
-        <button class="btn btn-primary mb-1" onclick="app.auth.login()">로그인</button>
-        <button class="btn btn-secondary" onclick="app.ui.toggleSignup(true)">회원가입</button>
-      </div>
-
-      <div id="signupBox" class="hidden">
-        <div class="input-group">
-          <input id="regId" type="text" placeholder="아이디 (필수)" autocomplete="username">
-        </div>
-        <div class="input-group">
-          <input id="regPw" type="password" placeholder="비밀번호 (필수)" autocomplete="new-password">
-        </div>
-        <div class="input-group">
-          <input id="regAge" type="number" placeholder="나이 (선택)" min="1" max="150">
-        </div>
-        <button class="btn btn-primary mb-1" onclick="app.auth.signup()">가입하기</button>
-        <button class="btn btn-secondary" onclick="app.ui.toggleSignup(false)">로그인으로</button>
-      </div>
-      <p id="authMsg" class="text-muted mt-1" style="color: var(--danger);"></p>
-    </div>
-  </div>
-
-  <!-- HOME SCREEN -->
-  <div id="screen-home" class="screen">
-    <div class="card">
-      <h2>👋 안녕하세요, <span id="userNameDisplay">게스트</span>님!</h2>
-      <p id="greetingMsg" class="text-muted">오늘도 건강한 하루 되세요.</p>
-      
-      <div class="stat-grid mt-2">
-        <div class="stat-card">
-          <div class="stat-value" id="homeDayCount">0</div>
-          <div class="stat-label">함께한 날</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="homeMoodCount">0</div>
-          <div class="stat-label">기분 기록</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>💭 오늘의 한마디</h2>
-      <p id="dailyQuote" class="text-muted" style="font-style: italic; font-size: 1rem;"></p>
-    </div>
-
-    <div class="card" style="cursor: pointer;" onclick="app.nav.go('mental')">
-      <h2>💗 현재 기분</h2>
-      <div id="homeMoodDisplay" class="stat-value" style="font-size: 1.5rem;">기록 없음</div>
-      <p class="text-muted text-small">탭하여 기록하기</p>
-    </div>
-
-    <div class="card">
-      <h2>🍽 오늘의 추천 식단</h2>
-      <div id="homeFoodResult" class="food-result">추천받아보세요</div>
-      <div class="btn-group mt-1">
-        <button class="btn btn-accent" onclick="app.food.recommend('#homeFoodResult')">추천받기</button>
-        <button class="btn btn-secondary" onclick="app.food.recommend('#homeFoodResult')">다시</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>⚙️ 설정</h2>
-      <div class="btn-group">
-        <button class="btn btn-secondary" onclick="app.data.exportData()">📤 내보내기</button>
-        <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📥 가져오기</button>
-      </div>
-      <div class="file-input-wrapper hidden">
-        <input type="file" id="importFile" accept=".json" onchange="app.data.importData(event)">
-      </div>
-      <button class="btn btn-danger mt-1" onclick="app.auth.logout()">로그아웃</button>
-    </div>
-  </div>
-
-  <!-- MENTAL SCREEN -->
-  <div id="screen-mental" class="screen">
-    <div class="card">
-      <h2>지금 기분이 어떠신가요?</h2>
-      <p class="text-muted">감정을 솔직하게 표현해보세요.</p>
-      <div class="mood-grid">
-        <button class="mood-btn" onclick="app.mental.setMood('happy')" aria-label="행복">😄</button>
-        <button class="mood-btn" onclick="app.mental.setMood('calm')" aria-label="평온">😌</button>
-        <button class="mood-btn" onclick="app.mental.setMood('excited')" aria-label="신남">🤩</button>
-        <button class="mood-btn" onclick="app.mental.setMood('neutral')" aria-label="보통">😐</button>
-        <button class="mood-btn" onclick="app.mental.setMood('worried')" aria-label="걱정">😟</button>
-        <button class="mood-btn" onclick="app.mental.setMood('sad')" aria-label="슬픔">😢</button>
-        <button class="mood-btn" onclick="app.mental.setMood('angry')" aria-label="화남">😡</button>
-        <button class="mood-btn" onclick="app.mental.setMood('tired')" aria-label="피곤">😫</button>
-        <button class="mood-btn" onclick="app.mental.setMood('anxious')" aria-label="불안">😰</button>
-      </div>
+  
+  <div class="container">
+    <!-- 다크모드 및 알람 모드 토글 -->
+    <div class="toggle-container">
+      <label>
+        <input type="checkbox" id="darkModeToggle"> 다크 모드
+      </label>
+      <label style="margin-left:15px;">
+        <input type="checkbox" id="alarmModeToggle"> 알람 모드
+      </label>
     </div>
     
-    <div id="moodResultCard" class="card hidden">
-      <h2>💡 AI의 공감 & 제안</h2>
-      <p id="moodComment" style="font-size: 1.05rem; line-height: 1.7;"></p>
-      <div class="divider"></div>
-      <p class="text-muted text-small">💾 기록은 안전하게 로컬에 저장됩니다.</p>
-    </div>
-
-    <div class="card">
-      <h2>📊 기분 통계 (최근 7일)</h2>
-      <canvas id="moodChart" width="400" height="250"></canvas>
-    </div>
-
-    <div class="card">
-      <h2>📅 최근 기분 기록</h2>
-      <ul id="moodHistoryList" class="list">
-        <li class="text-muted text-center">기록이 없습니다.</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- SLEEP SCREEN -->
-  <div id="screen-sleep" class="screen">
-    <div class="card">
-      <h2>🌙 수면 기록</h2>
-      <div class="time-input-group mt-1">
-        <label>취침</label>
-        <input id="sleepTime" type="time" value="23:00">
-        <select id="sleepAmpm">
-          <option value="PM">오후</option>
-          <option value="AM">오전</option>
-        </select>
-      </div>
-      <div class="time-input-group mt-1">
-        <label>기상</label>
-        <input id="wakeTime" type="time" value="07:00">
-        <select id="wakeAmpm">
-          <option value="AM" selected>오전</option>
-          <option value="PM">오후</option>
-        </select>
-      </div>
-      <div class="input-group mt-1">
-        <label>수면 질 (1-10)</label>
-        <input id="sleepQuality" type="range" min="1" max="10" value="7" 
-               oninput="document.getElementById('qualityValue').textContent = this.value">
-        <div class="text-center mt-1">
-          <span class="badge">품질: <span id="qualityValue">7</span>/10</span>
-        </div>
-      </div>
-      <button class="btn btn-primary mt-2" onclick="app.sleep.save()">💾 기록 저장</button>
-    </div>
-
-    <div class="card">
-      <h2>📈 수면 통계 (최근 7일)</h2>
-      <div class="stat-grid mb-2">
-        <div class="stat-card">
-          <div class="stat-value" id="avgSleepHours">0h</div>
-          <div class="stat-label">평균 수면</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="avgSleepQuality">0</div>
-          <div class="stat-label">평균 품질</div>
-        </div>
-      </div>
-      <canvas id="sleepChart" width="400" height="200"></canvas>
-    </div>
-
-    <div class="card">
-      <h2>📅 최근 수면 기록</h2>
-      <ul id="sleepList" class="list">
-        <li class="text-muted text-center">기록이 없습니다.</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- FOOD SCREEN -->
-  <div id="screen-food" class="screen">
-    <div class="card text-center">
-      <div style="font-size: 4rem;">🥗</div>
-      <h2>오늘 뭐 먹을까요?</h2>
-      <p class="text-muted">AI가 5,000+ 건강식을 추천해드려요.</p>
-      
-      <div class="food-result" id="foodResult">
-        추천을 받아보세요
-      </div>
-      
-      <div class="btn-group mt-2">
-        <button class="btn btn-accent" onclick="app.food.recommend('#foodResult')">
-          🎲 랜덤 추천
-        </button>
-        <button class="btn btn-secondary" onclick="app.food.recommendByCategory()">
-          📋 카테고리별
-        </button>
-      </div>
-      
-      <div id="categorySelection" class="hidden mt-2">
-        <select id="foodCategory" class="mb-1">
-          <option value="">카테고리 선택</option>
-          <option value="한식">한식</option>
-          <option value="양식">양식</option>
-          <option value="일식">일식</option>
-          <option value="중식">중식</option>
-          <option value="샐러드">샐러드</option>
-          <option value="수프">수프</option>
-          <option value="비건">비건</option>
-          <option value="저칼로리">저칼로리</option>
-        </select>
-        <button class="btn btn-primary" onclick="app.food.getCategoryFood()">추천받기</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>⭐ 즐겨찾기</h2>
-      <ul id="favoriteFoodList" class="list">
-        <li class="text-muted text-center">즐겨찾기가 비어있습니다.</li>
-      </ul>
-      <button class="btn btn-secondary mt-1" onclick="app.food.addToFavorites()">
-        현재 음식 저장
-      </button>
-    </div>
-  </div>
-
-  <!-- GAME SCREEN -->
-  <div id="screen-game" class="screen">
-    <div class="card">
-      <h2>🧠 건강 상식 퀴즈</h2>
-      <div class="stat-grid mb-2">
-        <div class="stat-card">
-          <div class="stat-value" id="gameScore">0</div>
-          <div class="stat-label">점수</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="gameStreak">0</div>
-          <div class="stat-label">연속 정답</div>
-        </div>
-      </div>
-      
-      <div class="card" style="background: var(--bg);">
-        <p id="gameQuestion" style="font-weight: 600; font-size: 1.1rem; min-height: 60px;">
-          문제를 불러오는 중...
-        </p>
-      </div>
-      
-      <input id="gameAnswer" type="text" placeholder="정답을 입력하세요" class="mb-1"
-             onkeypress="if(event.key==='Enter') app.game.check()">
-      
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="app.game.check()">✓ 정답 확인</button>
-        <button class="btn btn-secondary" onclick="app.game.next()">→ 다음 문제</button>
-      </div>
-      
-      <div id="gameFeedback" class="mt-1" style="font-weight: 600; min-height: 24px;"></div>
-      
-      <div class="progress-bar mt-2">
-        <div id="gameProgress" class="progress-fill" style="width: 0%"></div>
-      </div>
-      <p class="text-muted text-small text-center mt-1">
-        600+ 문제 / AI 생성 변형 포함
-      </p>
-    </div>
-
-    <div class="card">
-      <h2>🏆 최고 기록</h2>
-      <div class="stat-grid">
-        <div class="stat-card">
-          <div class="stat-value" id="bestScore">0</div>
-          <div class="stat-label">최고 점수</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="bestStreak">0</div>
-          <div class="stat-label">최대 연속</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- CHAT SCREEN -->
-  <div id="screen-chat" class="screen">
-    <div class="card chat-container">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h2 style="margin: 0;">🤖 AI 상담사</h2>
-        <button class="btn btn-secondary" style="width: auto; padding: 8px 16px; font-size: 0.85rem;" 
-                onclick="app.chat.clearHistory()">대화 초기화</button>
-      </div>
-      
-      <div id="chatHistory" class="chat-history">
-        <div class="chat-message ai">
-          안녕하세요! 저는 AI 건강 상담사입니다. 오늘 하루는 어떠셨나요? 편하게 이야기해 주세요. 😊
-        </div>
-      </div>
-      
-      <div class="typing-indicator" id="typingIndicator">
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-      </div>
-      
-      <div class="chat-input-container">
-        <input id="chatInput" type="text" placeholder="메시지를 입력하세요..." 
-               onkeypress="if(event.key==='Enter') app.chat.send()">
-        <button class="btn btn-primary" onclick="app.chat.send()" id="chatSendBtn">
-          <span>➤</span>
-        </button>
-      </div>
-      
-      <p class="text-muted text-small mt-1 text-center">
-        💡 10,000+ 키워드로 자연스러운 대화 지원 | AI 학습 모델 적용
-      </p>
-    </div>
-  </div>
-
-  <!-- BOTTOM NAV -->
-  <nav id="bottomNav" class="bottom-nav">
-    <button class="nav-btn" data-screen="home" onclick="app.nav.go('home')" aria-label="홈">
-      <span>🏠</span>홈
-    </button>
-    <button class="nav-btn" data-screen="mental" onclick="app.nav.go('mental')" aria-label="멘탈 케어">
-      <span>💕</span>멘탈
-    </button>
-    <button class="nav-btn" data-screen="sleep" onclick="app.nav.go('sleep')" aria-label="수면 기록">
-      <span>🌙</span>수면
-    </button>
-    <button class="nav-btn" data-screen="food" onclick="app.nav.go('food')" aria-label="건강 식단">
-      <span>🥗</span>음식
-    </button>
-    <button class="nav-btn" data-screen="game" onclick="app.nav.go('game')" aria-label="건강 퀴즈">
-      <span>🎮</span>게임
-    </button>
-    <button class="nav-btn" data-screen="chat" onclick="app.nav.go('chat')" aria-label="AI 상담">
-      <span>💬</span>상담
-    </button>
-  </nav>
-
-  <!-- NOTIFICATION -->
-  <div id="notification" class="notification"></div>
-</div>
-
-<script>
-// ========================================
-// DATA STORAGE & GENERATION
-// ========================================
-const DATA = {
-  foods: [],
-  foodCategories: {},
-  aiKeywordsByCategory: {},
-  aiResponses: {},
-  games: [],
-  moodEmojis: {
-    happy: '😄', calm: '😌', excited: '🤩', neutral: '😐',
-    worried: '😟', sad: '😢', angry: '😡', tired: '😫', anxious: '😰'
-  }
-};
-
-// ========================================
-// APP CORE
-// ========================================
-const app = {
-  state: {
-    user: null,
-    currentGame: null,
-    gameScore: 0,
-    gameStreak: 0,
-    currentFood: '',
-    chatHistory: [],
-    theme: 'light'
-  },
-
-  init: async function() {
-    console.log('🚀 앱 초기화 시작...');
+    <!-- 음식 추천 섹션 -->
+    <section id="foodSection">
+      <h2>랜덤 음식 추천</h2>
+      <button id="randomFoodBtn">음식 추천 받기</button>
+      <button id="resetFoodBtn">결과 초기화</button>
+      <div id="foodOutput" style="margin-top:10px; font-weight:bold;"></div>
+    </section>
     
-    // 데이터 생성
-    await this.dataGenerator.initAll({
-      foods: 5000,
-      aiKeywords: 10000,
-      games: 600
+    <!-- AI 감정 상담 섹션 -->
+    <section id="aiSection">
+      <h2>AI 감정 상담</h2>
+      <select id="emotionSelect">
+        <option value="" disabled selected>감정을 선택하세요</option>
+        <option value="행복">행복</option>
+        <option value="슬픔">슬픔</option>
+        <option value="분노">분노</option>
+      </select>
+      <button id="aiCounselBtn">상담 받기</button>
+      <button id="resetAiBtn">결과 초기화</button>
+      <div id="aiOutput" style="margin-top:10px; font-weight:bold;"></div>
+    </section>
+    
+    <!-- 건강 퀴즈 섹션 -->
+    <section id="quizSection">
+      <h2>건강 상식 퀴즈</h2>
+      <button id="loadQuizBtn">문제 불러오기</button>
+      <button id="resetQuizBtn">퀴즈 초기화</button>
+      <div id="quizDisplay" style="margin-top:10px; font-weight:bold;"></div>
+      <input type="text" id="answerInput" placeholder="정답을 입력하세요">
+      <button id="checkAnswerBtn">정답 확인</button>
+      <button id="resetAnswerBtn">입력 초기화</button>
+      <div id="resultOutput" style="margin-top:10px; font-weight:bold;"></div>
+    </section>
+  </div>
+  
+  <script>
+    // ========================= DATA 초기화 =========================
+    
+    // 음식 데이터 (한국식 데이터 위주)
+    const foods = ["불고기", "비빔밥", "김치찌개", "삼겹살", "떡볶이"];
+    
+    // 감정별 AI 상담 문구
+    const aiResponses = {
+      "행복": ["오늘 정말 좋은 일이 있었네요!", "행복한 미소를 유지하세요.", "세상은 당신의 웃음으로 빛납니다."],
+      "슬픔": ["슬픔을 이겨내고 더 강해지세요.", "어려운 시기도 지나갑니다.", "당신은 소중한 사람이에요."],
+      "분노": ["조금 진정해보세요. 마음을 다스리는 것이 중요합니다.", "차분해지면 해결책이 보일 거예요.", "잠깐 휴식을 취해보세요."]
+    };
+    
+    // 건강 퀴즈 데이터 (문제와 정답)
+    const quizQuestions = [
+      { question: "하루에 물은 몇 리터 마시는 것이 좋을까요?", answer: "2" },
+      { question: "정상적인 혈압의 범위는 어느 정도인가요? (수축기/이완기)", answer: "120/80" },
+      { question: "비타민 C가 풍부한 과일은 무엇일까요?", answer: "감" }
+    ];
+    
+    // currentQuestion 객체: 현재 로드된 퀴즈 문제 저장
+    let currentQuestion = null;
+    
+    // ========================= 유틸리티 함수 =========================
+    // 배열의 랜덤 인덱스 값을 반환하는 함수
+    function getRandomIndex(array) {
+      return Math.floor(Math.random() * array.length);
+    }
+    
+    // ========================= 음식 추천 기능 =========================
+    const randomFoodBtn = document.getElementById("randomFoodBtn");
+    const foodOutput = document.getElementById("foodOutput");
+    const resetFoodBtn = document.getElementById("resetFoodBtn");
+    
+    randomFoodBtn.addEventListener("click", function () {
+      const randomFood = foods[getRandomIndex(foods)];
+      foodOutput.textContent = "추천 음식: " + randomFood;
     });
     
-    // 테마 로드
-    this.loadTheme();
-    
-    // 인증 확인
-    this.auth.checkSession();
-    
-    // 게임 초기화
-    this.game.loadStats();
-    this.game.next();
-    
-    // 명언 설정
-    this.setDailyQuote();
-    
-    // PWA 설치 프롬프트
-    this.setupPWA();
-    
-    console.log('✅ 앱 초기화 완료');
-    console.log('📊 데이터:', {
-      foods: DATA.foods.length,
-      keywords: Object.values(DATA.aiKeywordsByCategory).flat().length,
-      games: DATA.games.length
+    resetFoodBtn.addEventListener("click", function() {
+      foodOutput.textContent = "";
     });
-  },
-
-  // ========================================
-  // THEME
-  // ========================================
-  toggleTheme: function() {
-    const html = document.documentElement;
-    const currentTheme = html.getAttribute('data-theme') || 'light';
-    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
     
-    html.setAttribute('data-theme', newTheme);
-    this.state.theme = newTheme;
-    localStorage.setItem('app_theme', newTheme);
+    // ========================= AI 감정 상담 기능 =========================
+    const aiCounselBtn = document.getElementById("aiCounselBtn");
+    const emotionSelect = document.getElementById("emotionSelect");
+    const aiOutput = document.getElementById("aiOutput");
+    const resetAiBtn = document.getElementById("resetAiBtn");
     
-    document.getElementById('themeIcon').textContent = newTheme === 'light' ? '🌙' : '☀️';
-    
-    this.notify(newTheme === 'dark' ? '다크 모드 활성화' : '라이트 모드 활성화', 'success');
-  },
-
-  loadTheme: function() {
-    const saved = localStorage.getItem('app_theme') || 'light';
-    this.state.theme = saved;
-    document.documentElement.setAttribute('data-theme', saved);
-    document.getElementById('themeIcon').textContent = saved === 'light' ? '🌙' : '☀️';
-  },
-
-  // ========================================
-  // NOTIFICATIONS
-  // ========================================
-  notify: function(message, type = 'success') {
-    const notification = document.getElementById('notification');
-    notification.textContent = message;
-    notification.className = `notification ${type} active`;
-    
-    setTimeout(() => {
-      notification.classList.remove('active');
-    }, 3000);
-  },
-
-  // ========================================
-  // PWA
-  // ========================================
-  setupPWA: function() {
-    if ('serviceWorker' in navigator) {
-      // Service Worker는 별도 파일 필요로 생략
-      // 대신 manifest만 인라인으로 처리
-    }
-    
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      // 설치 버튼 표시 가능
+    aiCounselBtn.addEventListener("click", function () {
+      const selectedEmotion = emotionSelect.value;
+      if (!selectedEmotion) {
+        aiOutput.textContent = "먼저 감정을 선택해주세요.";
+        return;
+      }
+      const responses = aiResponses[selectedEmotion];
+      const randomResponse = responses[getRandomIndex(responses)];
+      aiOutput.textContent = randomResponse;
     });
-  },
-
-  // ========================================
-  // AUTH
-  // ========================================
-  auth: {
-    getUsers: () => JSON.parse(localStorage.getItem('app_users') || '{}'),
-    saveUsers: users => localStorage.setItem('app_users', JSON.stringify(users)),
     
-    hashPassword: async function(password) {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(password);
-      const hash = await crypto.subtle.digest('SHA-256', data);
-      return Array.from(new Uint8Array(hash))
-        .map(b => b.toString(16).padStart(2, '0')).join('');
-    },
-
-    signup: async function() {
-      const id = document.getElementById('regId').value.trim();
-      const pw = document.getElementById('regPw').value.trim();
-      const age = document.getElementById('regAge').value.trim();
-      const msgEl = document.getElementById('authMsg');
-      
-      msgEl.textContent = '';
-      
-      if (!id || !pw) {
-        msgEl.textContent = '⚠️ 아이디와 비밀번호를 입력해주세요.';
+    resetAiBtn.addEventListener("click", function() {
+      aiOutput.textContent = "";
+      emotionSelect.selectedIndex = 0;
+    });
+    
+    // ========================= 건강 퀴즈 기능 =========================
+    const loadQuizBtn = document.getElementById("loadQuizBtn");
+    const quizDisplay = document.getElementById("quizDisplay");
+    const answerInput = document.getElementById("answerInput");
+    const checkAnswerBtn = document.getElementById("checkAnswerBtn");
+    const resultOutput = document.getElementById("resultOutput");
+    const resetQuizBtn = document.getElementById("resetQuizBtn");
+    const resetAnswerBtn = document.getElementById("resetAnswerBtn");
+    
+    loadQuizBtn.addEventListener("click", function () {
+      currentQuestion = quizQuestions[getRandomIndex(quizQuestions)];
+      quizDisplay.textContent = "문제: " + currentQuestion.question;
+      resultOutput.textContent = "";
+      answerInput.value = "";
+    });
+    
+    checkAnswerBtn.addEventListener("click", function () {
+      if (!currentQuestion) {
+        resultOutput.textContent = "먼저 문제를 불러오세요.";
         return;
       }
-      
-      if (pw.length < 4) {
-        msgEl.textContent = '⚠️ 비밀번호는 4자 이상이어야 합니다.';
-        return;
-      }
-      
-      const users = this.getUsers();
-      if (users[id]) {
-        msgEl.textContent = '⚠️ 이미 존재하는 아이디입니다.';
-        return;
-      }
-      
-      const hashedPw = await this.hashPassword(pw);
-      users[id] = {
-        pw: hashedPw,
-        age: age || null,
-        joinDate: new Date().toISOString()
-      };
-      
-      this.saveUsers(users);
-      app.notify('✅ 회원가입 완료! 로그인해주세요.', 'success');
-      app.ui.toggleSignup(false);
-      
-      // 입력 필드 초기화
-      document.getElementById('regId').value = '';
-      document.getElementById('regPw').value = '';
-      document.getElementById('regAge').value = '';
-    },
-
-    login: async function() {
-      const id = document.getElementById('loginId').value.trim();
-      const pw = document.getElementById('loginPw').value.trim();
-      const users = this.getUsers();
-      const msgEl = document.getElementById('authMsg');
-      
-      msgEl.textContent = '';
-      
-      if (!id || !pw) {
-        msgEl.textContent = '⚠️ 아이디와 비밀번호를 입력해주세요.';
-        return;
-      }
-      
-      const hashedPw = await this.hashPassword(pw);
-      
-      if (users[id] && users[id].pw === hashedPw) {
-        app.state.user = { id, ...users[id] };
-        localStorage.setItem('app_current_user', JSON.stringify(app.state.user));
-        app.ui.onLoginSuccess();
-        app.notify('🎉 로그인 성공!', 'success');
+      const userAnswer = answerInput.value.trim().toLowerCase();
+      const correctAnswer = currentQuestion.answer.trim().toLowerCase();
+      if (userAnswer === correctAnswer) {
+        resultOutput.textContent = "정답입니다!";
       } else {
-        msgEl.textContent = '❌ 아이디 또는 비밀번호가 틀렸습니다.';
+        resultOutput.textContent = "오답입니다. 정답은: " + currentQuestion.answer;
       }
-    },
-
-    logout: function() {
-      if (!confirm('정말 로그아웃 하시겠습니까?')) return;
-      
-      app.state.user = null;
-      localStorage.removeItem('app_current_user');
-      app.notify('👋 로그아웃 되었습니다.', 'success');
-      
-      setTimeout(() => {
-        location.reload();
-      }, 1000);
-    },
-
-    checkSession: function() {
-      const saved = localStorage.getItem('app_current_user');
-      if (saved) {
-        try {
-          app.state.user = JSON.parse(saved);
-          app.ui.onLoginSuccess();
-        } catch (e) {
-          console.error('세션 복원 실패:', e);
-          localStorage.removeItem('app_current_user');
-        }
-      }
-    }
-  },
-
-  // ========================================
-  // UI
-  // ========================================
-  ui: {
-    toggleSignup: function(show) {
-      document.getElementById('loginBox').classList.toggle('hidden', show);
-      document.getElementById('signupBox').classList.toggle('hidden', !show);
-      document.getElementById('authMsg').textContent = '';
-    },
-
-    onLoginSuccess: function() {
-      const user = app.state.user;
-      document.getElementById('userNameDisplay').textContent = user.id;
-      document.getElementById('bottomNav').classList.add('active');
-      
-      // 가입일로부터 경과일 계산
-      const joinDate = new Date(user.joinDate);
-      const today = new Date();
-      const dayCount = Math.floor((today - joinDate) / (1000 * 60 * 60 * 24));
-      document.getElementById('homeDayCount').textContent = dayCount;
-      
-      // 기분 기록 개수
-      const moodHistory = JSON.parse(localStorage.getItem(`mood_history_${user.id}`) || '[]');
-      document.getElementById('homeMoodCount').textContent = moodHistory.length;
-      
-      // 현재 기분 표시
-      app.mental.loadCurrentMood();
-      
-      // 수면 데이터 로드
-      app.sleep.load();
-      
-      // 차트 렌더링
-      app.mental.renderChart();
-      app.sleep.renderChart();
-      
-      app.nav.go('home');
-    }
-  },
-
-  // ========================================
-  // NAVIGATION
-  // ========================================
-  nav: {
-    go: function(screenId) {
-      if (screenId !== 'login' && !app.state.user) {
-        app.notify('⚠️ 로그인이 필요합니다.', 'warning');
-        return app.nav.go('login');
-      }
-      
-      // 화면 전환
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      const target = document.getElementById('screen-' + screenId);
-      if (target) target.classList.add('active');
-      
-      // 헤더 타이틀
-      const titles = {
-        home: '홈',
-        mental: '멘탈 케어',
-        sleep: '수면 기록',
-        food: '건강 식단',
-        game: '건강 퀴즈',
-        chat: 'AI 상담',
-        login: '마음 챙김 & 건강 파트너 Pro'
-      };
-      document.getElementById('headerTitle').textContent = titles[screenId] || '건강 관리';
-      
-      // 네비 활성화
-      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-      const btn = document.querySelector(`.nav-btn[data-screen="${screenId}"]`);
-      if (btn) btn.classList.add('active');
-      
-      // 화면별 초기화
-      if (screenId === 'mental') {
-        app.mental.renderChart();
-        app.mental.renderHistory();
-      } else if (screenId === 'sleep') {
-        app.sleep.renderChart();
-      } else if (screenId === 'food') {
-        app.food.loadFavorites();
+    });
+    
+    resetQuizBtn.addEventListener("click", function () {
+      currentQuestion = null;
+      quizDisplay.textContent = "";
+      resultOutput.textContent = "";
+    });
+    
+    resetAnswerBtn.addEventListener("click", function () {
+      answerInput.value = "";
+      resultOutput.textContent = "";
+    });
+    
+    // ========================= 다크 모드 토글 기능 =========================
+    const darkModeToggle = document.getElementById("darkModeToggle");
+    darkModeToggle.addEventListener("change", function() {
+      document.body.classList.toggle("dark", darkModeToggle.checked);
+    });
+    
+    // ========================= 알람 모드 (스텁 기능) =========================
+    // 알람 모드가 켜지면 버튼 클릭 시 경고음을 내도록 함 (간단한 예제)
+    const alarmModeToggle = document.getElementById("alarmModeToggle");
+    function playAlarm() {
+      if (alarmModeToggle.checked) {
+        // 간단한 beep 소리 (Web Audio API 사용)
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = context.createOscillator();
+        oscillator.type = "sine";
+        oscillator.frequency.setValueAtTime(440, context.currentTime); // A4 note
+        oscillator.connect(context.destination);
+        oscillator.start();
+        oscillator.stop(context.currentTime + 0.2);
       }
     }
-  },
+    // 모든 주요 버튼 클릭 시 알람 재생 (예: 음식 추천, AI 상담, 퀴즈 로드, 정답 확인)
+    const alarmButtons = [randomFoodBtn, aiCounselBtn, loadQuizBtn, checkAnswerBtn];
+    alarmButtons.forEach(btn => {
+      btn.addEventListener("click", playAlarm);
+    });
+    
+  </script>
+</body>
+</html>
+```
 
-  // ========================================
-  // MENTAL (감정 기록)
-  // ========================================
-  mental: {
-    setMood: function(mood) {
-      if (!app.state.user) return;
-      
-      const responses = {
-        happy: [
-          "긍정 에너지가 넘치네요! ✨ 이 기분을 주변 사람들과 나눠보세요.",
-          "오늘이 참 좋은 날이네요! 😊 계속 웃으며 하루를 보내세요.",
-          "행복한 감정은 전염됩니다! 주변에 좋은 영향을 주고 있어요."
-        ],
-        calm: [
-          "평온함은 큰 선물입니다. 😌 깊게 숨을 쉬며 이 순간을 즐겨보세요.",
-          "차분한 마음으로 오늘 하루를 천천히 계획해보세요.",
-          "내면의 평화를 느끼고 계시네요. 이 상태를 유지해보세요."
-        ],
-        excited: [
-          "신나는 일이 있으신가요? 🤩 그 에너지로 멋진 일을 만들어보세요!",
-          "열정적인 모습이 보기 좋습니다! 긍정적인 에너지를 잘 활용하세요.",
-          "들뜬 마음을 좋은 방향으로 사용해보세요. 새로운 도전도 좋습니다!"
-        ],
-        neutral: [
-          "무난한 하루도 소중합니다. 가벼운 산책을 추천해요. 🚶",
-          "오늘의 작은 성취 하나를 만들어보는 건 어떨까요?",
-          "평범함 속에서도 감사할 것들을 찾아보세요."
-        ],
-        worried: [
-          "걱정이 많으신가요? 😟 깊은 호흡을 해보세요. 모든 것은 지나갑니다.",
-          "걱정을 종이에 적어보세요. 생각이 정리될 거예요.",
-          "걱정의 대부분은 일어나지 않습니다. 현재에 집중해보세요."
-        ],
-        sad: [
-          "괜찮아요. 혼자가 아니에요. 😢 따뜻한 차 한 잔 어떠세요?",
-          "슬픔도 자연스러운 감정입니다. 충분히 느끼고 표현하세요.",
-          "힘든 시간은 지나갑니다. 작은 산책이나 좋아하는 음악을 들어보세요."
-        ],
-        angry: [
-          "화가 나실 때는 잠시 멈추고 깊게 숨을 쉬어보세요. 😡",
-          "한 걸음 떨어져서 상황을 바라보면 도움이 됩니다.",
-          "격한 감정은 시간이 지나면 가라앉습니다. 진정할 시간을 가지세요."
-        ],
-        tired: [
-          "많이 피곤하시군요. 😫 15-20분 낮잠이 큰 도움이 됩니다.",
-          "수분을 충분히 섭취하고 가벼운 스트레칭을 해보세요.",
-          "몸이 보내는 신호입니다. 충분한 휴식을 취하세요."
-        ],
-        anxious: [
-          "불안한 마음이 드시나요? 😰 4-7-8 호흡법을 시도해보세요.",
-          "불안은 미래에 대한 걱정입니다. 지금 이 순간에 집중해보세요.",
-          "불안할 때는 할 수 있는 작은 일부터 하나씩 해결해보세요."
-        ]
-      };
-      
-      const messages = responses[mood] || ["지금의 감정을 잘 살펴보세요."];
-      const message = messages[Math.floor(Math.random() * messages.length)];
-      
-      // UI 업데이트
-      document.getElementById('moodResultCard').classList.remove('hidden');
-      document.getElementById('moodComment').innerHTML = `<strong>${message}</strong>`;
-      
-      // 기록 저장
-      const key = `mood_history_${app.state.user.id}`;
-      const history = JSON.parse(localStorage.getItem(key) || '[]');
-      history.unshift({
-        date: new Date().toISOString(),
-        mood: mood,
-        emoji: DATA.moodEmojis[mood]
-      });
-      
-      if (history.length > 100) history.pop();
-      localStorage.setItem(key, JSON.stringify(history));
-      
-      // 현재 기분 저장
-      localStorage.setItem(`mood_${app.state.user.id}`, mood);
-      
-      // 홈 화면 업데이트
-      this.loadCurrentMood();
-      
-      // 통계 업데이트
-      document.getElementById('homeMoodCount').textContent = history.length;
-      
-      // 차트 렌더링
-      this.renderChart();
-      this.renderHistory();
-      
-      app.notify('✅ 기분이 기록되었습니다.', 'success');
-    },
-
-    loadCurrentMood: function() {
-      if (!app.state.user) return;
-      
-      const mood = localStorage.getItem(`mood_${app.state.user.id}`);
-      const display = document.getElementById('homeMoodDisplay');
-      
-      if (mood && DATA.moodEmojis[mood]) {
-        display.textContent = `${DATA.moodEmojis[mood]} ${mood.toUpperCase()}`;
-      } else {
-        display.textContent = '기록 없음';
-      }
-    },
-
-    renderChart: function() {
-      if (!app.state.user) return;
-      
-      const canvas = document.getElementById('moodChart');
-      if (!canvas) return;
-      
-      const ctx = canvas.getContext('2d');
-      const history = JSON.parse(localStorage.getItem(`mood_history_${app.state.user.id}`) || '[]');
-      
-      // 최근 7일 데이터
-      const last7Days = [];
-      for (let i = 6; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const dateStr = date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
-        last7Days.push({ date: dateStr, moods: {} });
-      }
-      
-      // 데이터 집계
-      history.forEach(record => {
-        const recordDate = new Date(record.date).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
-        const dayData = last7Days.find(d => d.date === recordDate);
-        if (dayData) {
-          dayData.moods[record.mood] = (dayData.moods[record.mood] || 0) + 1;
-        }
-      });
-      
-      // 차트 그리기
-      const width = canvas.width;
-      const height = canvas.height;
-      const padding = 40;
-      const chartWidth = width - padding * 2;
-      const chartHeight = height - padding * 2;
-      
-      ctx.clearRect(0, 0, width, height);
-      
-      // 배경
-      const isDark = app.state.theme === 'dark';
-      ctx.fillStyle = isDark ? '#1f2937' : '#f9fafb';
-      ctx.fillRect(0, 0, width, height);
-      
-      // 격자
-      ctx.strokeStyle = isDark ? '#374151' : '#e5e7eb';
-      ctx.lineWidth = 1;
-      for (let i = 0; i <= 5; i++) {
-        const y = padding + (chartHeight / 5) * i;
-        ctx.beginPath();
-        ctx.moveTo(padding, y);
-        ctx.lineTo(width - padding, y);
-        ctx.stroke();
-      }
-      
-      // 막대 그리기
-      const barWidth = chartWidth / last7Days.length / 1.5;
-      const maxCount = Math.max(...last7Days.map(d => Object.values(d.moods).reduce((a, b) => a + b, 0))) || 1;
-      
-      last7Days.forEach((day, index) => {
-        const x = padding + (chartWidth / last7Days.length) * index + (chartWidth / last7Days.length - barWidth) / 2;
-        const totalCount = Object.values(day.moods).reduce((a, b) => a + b, 0);
-        const barHeight = (totalCount / maxCount) * chartHeight;
-        
-        // 막대
-        const gradient = ctx.createLinearGradient(x, height - padding - barHeight, x, height - padding);
-        gradient.addColorStop(0, '#6366f1');
-        gradient.addColorStop(1, '#8b5cf6');
-        
-        ctx.fillStyle = gradient;
-        ctx.fillRect(x, height - padding - barHeight, barWidth, barHeight);
-        
-        // 날짜 레이블
-        ctx.fillStyle = isDark ? '#9ca3af' : '#6b7280';
-        ctx.font = '10px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(day.date, x + barWidth / 2, height - padding + 20);
-        
-        // 개수 표시
-        if (totalCount > 0) {
-          ctx.fillStyle = isDark ? '#f9fafb' : '#1f2937';
-          ctx.font = 'bold 12px sans-serif';
-          ctx.fillText(totalCount, x + barWidth / 2, height - padding - barHeight - 5);
-        }
-      });
-      
-      // 제목
-      ctx.fillStyle = isDark ? '#f9fafb' : '#1f2937';
-      ctx.font = 'bold 14px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('일별 기분 기록 횟수', width / 2, 20);
-    },
-
-    renderHistory: function() {
-      if (!app.state.user) return;
-      
-      const list = document.getElementById('moodHistoryList');
-      const history = JSON.parse(localStorage.getItem(`mood_history_${app.state.user.id}`) || '[]');
-      
-      if (history.length === 0) {
-        list.innerHTML = '<li class="text-muted text-center">기록이 없습니다.</li>';
-        return;
-      }
-      
-      list.innerHTML = history.slice(0, 10).map(record => {
-        const date = new Date(record.date);
-        const dateStr = date.toLocaleDateString('ko-KR', {
-          month: 'long',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        });
-        
-        return `
-          <li class="list-item">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <span style="font-size: 1.5rem; margin-right: 8px;">${record.emoji}</span>
-                <span style="font-weight: 600;">${record.mood.toUpperCase()}</span>
-              </div>
-              <div class="text-muted text-small">${dateStr}</div>
-            </div>
-          </li>
-        `;
-      }).join('');
-    }
-  },
-
-  // ========================================
-  // SLEEP (수면 기록)
-  // ========================================
-  sleep: {
-    save: function() {
-      if (!app.state.user) {
-        app.notify('⚠️ 로그인이 필요합니다.', 'warning');
-        return;
-      }
-      
-      const sleepTime = document.getElementById('sleepTime').value;
-      const sleepAmpm = document.getElementById('sleepAmpm').value;
-      const wakeTime = document.getElementById('wakeTime').value;
-      const wakeAmpm = document.getElementById('wakeAmpm').value;
-      const quality = parseInt(document.getElementById('sleepQuality').value);
-      
-      if (!sleepTime || !wakeTime) {
-        app.notify('⚠️ 시간을 모두 입력해주세요.', 'warning');
-        return;
-      }
-      
-      // 시간을 24시간 형식으로 변환
-      const to24Hour = (time, ampm) => {
-        const [hh, mm] = time.split(':').map(Number);
-        let hour = hh;
-        if (ampm === 'PM' && hh < 12) hour = hh + 12;
-        if (ampm === 'AM' && hh === 12) hour = 0;
-        return hour * 60 + mm;
-      };
-      
-      const startMin = to24Hour(sleepTime, sleepAmpm);
-      const endMin = to24Hour(wakeTime, wakeAmpm);
-      
-      // 수면 시간 계산 (overnight 고려)
-      let durationMin = endMin - startMin;
-      if (durationMin <= 0) durationMin += 24 * 60;
-      
-      const hours = Math.floor(durationMin / 60);
-      const mins = durationMin % 60;
-      
-      const log = {
-        date: new Date().toISOString(),
-        dateStr: new Date().toLocaleDateString('ko-KR'),
-        start: `${sleepTime} ${sleepAmpm === 'PM' ? '오후' : '오전'}`,
-        end: `${wakeTime} ${wakeAmpm === 'PM' ? '오후' : '오전'}`,
-        duration: `${hours}시간 ${mins}분`,
-        durationHours: hours + mins / 60,
-        quality: quality
-      };
-      
-      const key = `sleep_${app.state.user.id}`;
-      const logs = JSON.parse(localStorage.getItem(key) || '[]');
-      logs.unshift(log);
-      
-      if (logs.length > 30) logs.pop();
-      localStorage.setItem(key, JSON.stringify(logs));
-      
-      this.renderLogs(logs);
-      this.renderChart();
-      this.updateStats();
-      
-      app.notify('✅ 수면 기록이 저장되었습니다 🌙', 'success');
-    },
-
-    load: function() {
-      if (!app.state.user) return;
-      
-      const key = `sleep_${app.state.user.id}`;
-      const logs = JSON.parse(localStorage.getItem(key) || '[]');
-      this.renderLogs(logs);
-      this.updateStats();
-    },
-
-    renderLogs: function(logs) {
-      const list = document.getElementById('sleepList');
-      
-      if (!logs || logs.length === 0) {
-        list.innerHTML = '<li class="text-muted text-center">기록이 없습니다.</li>';
-        return;
-      }
-      
-      list.innerHTML = logs.slice(0, 10).map(log => `
-        <li class="list-item">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-            <strong style="color: var(--primary);">${log.dateStr}</strong>
-            <span class="badge ${log.quality >= 7 ? 'accent' : log.quality >= 4 ? '' : 'danger'}">
-              품질: ${log.quality}/10
-            </span>
-          </div>
-          <div class="text-muted text-small">
-            🛌 ${log.start} → ☀️ ${log.end}
-          </div>
-          <div style="margin-top: 4px;">
-            <strong>⏱️ ${log.duration}</strong>
-          </div>
-        </li>
-      `).join('');
-    },
-
-    updateStats: function() {
-      if (!app.state.user) return;
-      
-      const key = `sleep_${app.state.user.id}`;
-      const logs = JSON.parse(localStorage.getItem(key) || '[]');
-      const last7 = logs.slice(0, 7);
-      
-      if (last7.length === 0) {
-        document.getElementById('avgSleepHours').textContent = '0h';
-        document.getElementById('avgSleepQuality').textContent = '0';
-        return;
-      }
-      
-      const avgHours = last7.reduce((sum, log) => sum + log.durationHours, 0) / last7.length;
-      const avgQuality = last7.reduce((sum, log) => sum + log.quality, 0) / last7.length;
-      
-      document.getElementById('avgSleepHours').textContent = `${avgHours.toFixed(1)}h`;
-      document.getElementById('avgSleepQuality').textContent = `${avgQuality.toFixed(1)}/10`;
-    },
-
-    renderChart: function() {
-      if (!app.state.user) return;
-      
-      const canvas = document.getElementById('sleepChart');
-      if (!canvas) return;
-      
-      const ctx = canvas.getContext('2d');
-      const logs = JSON.parse(localStorage.getItem(`sleep_${app.state.user.id}`) || '[]');
-      const last7 = logs.slice(0, 7).reverse();
-      
-      const width = canvas.width;
-      const height = canvas.height;
-      const padding = 40;
-      const chartWidth = width - padding * 2;
-      const chartHeight = height - padding * 2;
-      
-      ctx.clearRect(0, 0, width, height);
-      
-      // 배경
-      const isDark = app.state.theme === 'dark';
-      ctx.fillStyle = isDark ? '#1f2937' : '#f9fafb';
-      ctx.fillRect(0, 0, width, height);
-      
-      if (last7.length === 0) {
-        ctx.fillStyle = isDark ? '#9ca3af' : '#6b7280';
-        ctx.font = '14px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('데이터가 없습니다', width / 2, height / 2);
-        return;
-      }
-      
-      // 격자
-      ctx.strokeStyle = isDark ? '#374151' : '#e5e7eb';
-      ctx.lineWidth = 1;
-      for (let i = 0; i <= 4; i++) {
-        const y = padding + (chartHeight / 4) * i;
-        ctx.beginPath();
-        ctx.moveTo(padding, y);
-        ctx.lineTo(width - padding, y);
-        ctx.stroke();
-      }
-      
-      // 라인 그리기
-      const maxHours = 12;
-      ctx.beginPath();
-      ctx.strokeStyle = '#6366f1';
-      ctx.lineWidth = 3;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      
-      last7.forEach((log, index) => {
-        const x = padding + (chartWidth / (last7.length - 1)) * index;
-        const y = height - padding - (log.durationHours / maxHours) * chartHeight;
-        
-        if (index === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-        }
-      });
-      ctx.stroke();
-      
-      // 포인트 그리기
-      last7.forEach((log, index) => {
-        const x = padding + (chartWidth / (last7.length - 1)) * index;
-        const y = height - padding - (log.durationHours / maxHours) * chartHeight;
-        
-        // 포인트
-        ctx.fillStyle = '#6366f1';
-        ctx.beginPath();
-        ctx.arc(x, y, 5, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // 외곽선
-        ctx.strokeStyle = isDark ? '#1f2937' : '#ffffff';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        
-        // 값 표시
-        ctx.fillStyle = isDark ? '#f9fafb' : '#1f2937';
-        ctx.font = 'bold 11px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(`${log.durationHours.toFixed(1)}h`, x, y - 12);
-        
-        // 날짜
-        const date = new Date(log.date);
-        const dateStr = date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
-        ctx.fillStyle = isDark ? '#9ca3af' : '#6b7280';
-        ctx.font = '10px sans-serif';
-        ctx.fillText(dateStr, x, height - padding + 20);
-      });
-      
-      // Y축 레이블
-      ctx.fillStyle = isDark ? '#9ca3af' : '#6b7280';
-      ctx.font = '10px sans-serif';
-      ctx.textAlign = 'right';
-      for (let i = 0; i <= 4; i++) {
-        const y = padding + (chartHeight / 4) * i;
-        const hours = maxHours - (maxHours / 4) * i;
-        ctx.fillText(`${hours}h`, padding - 10, y + 4);
-      }
-      
-      // 제목
-      ctx.fillStyle = isDark ? '#f9fafb' : '#1f2937';
-      ctx.font = 'bold 14px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('수면 시간 추이', width / 2, 20);
-    }
-  },
-
-  // ========================================
-  // FOOD (음식 추천)
-  // ========================================
-  food: {
-    recommend: function(selector = '#foodResult') {
-      if (DATA.foods.length === 0) return;
-      
-      const element = document.querySelector(selector);
-      if (!element) return;
-      
-      // 애니메이션
-      element.classList.add('animating');
-      
-      setTimeout(() => {
-        const food = DATA.foods[Math.floor(Math.random() * DATA.foods.length)];
-        app.state.currentFood = food;
-        element.textContent = food;
-        element.classList.remove('animating');
-      }, 250);
-    },
-
-    recommendByCategory: function() {
-      const selection = document.getElementById('categorySelection');
-      selection.classList.toggle('hidden');
-    },
-
-    getCategoryFood: function() {
-      const category = document.getElementById('foodCategory').value;
-      if (!category) {
-        app.notify('⚠️ 카테고리를 선택해주세요.', 'warning');
-        return;
-      }
-      
-      const foods = DATA.foodCategories[category] || [];
-      if (foods.length === 0) {
-        app.notify('⚠️ 해당 카테고리에 음식이 없습니다.', 'warning');
-        return;
-      }
-      
-      const food = foods[Math.floor(Math.random() * foods.length)];
-      app.state.currentFood = food;
-      document.getElementById('foodResult').textContent = food;
-      app.notify('✅ 추천 완료!', 'success');
-    },
-
-    addToFavorites: function() {
-      if (!app.state.user) {
-        app.notify('⚠️ 로그인이 필요합니다.', 'warning');
-        return;
-      }
-      
-      const food = app.state.currentFood;
-      if (!food) {
-        app.notify('⚠️ 먼저 음식을 추천받으세요.', 'warning');
-        return;
-      }
-      
-      const key = `favorites_${app.state.user.id}`;
-      const favorites = JSON.parse(localStorage.getItem(key) || '[]');
-      
-      if (favorites.includes(food)) {
-        app.notify('⚠️ 이미 즐겨찾기에 있습니다.', 'warning');
-        return;
-      }
-      
-      favorites.unshift(food);
-      if (favorites.length > 20) favorites.pop();
-      localStorage.setItem(key, JSON.stringify(favorites));
-      
-      this.loadFavorites();
-      app.notify('⭐ 즐겨찾기에 추가되었습니다!', 'success');
-    },
-
-    loadFavorites: function() {
-      if (!app.state.user) return;
-      
-      const key = `favorites_${app.state.user.id}`;
-      const favorites = JSON.parse(localStorage.getItem(key) || '[]');
-      const list = document.getElementById('favoriteFoodList');
-      
-      if (favorites.length === 0) {
-        list.innerHTML = '<li class="text-muted text-center">즐겨찾기가 비어있습니다.</li>';
-        return;
-      }
-      
-      list.innerHTML = favorites.map((food, index) => `
-        <li class="list-item" style="display: flex; justify-content: space-between; align-items: center;">
-          <span>${food}</span>
-          <button class="btn btn-danger" style="width: auto; padding: 6px 12px; font-size: 0.85rem;"
-                  onclick="app.food.removeFavorite(${index})">삭제</button>
-        </li>
-      `).join('');
-    },
-
-    removeFavorite: function(index) {
-      if (!app.state.user) return;
-      
-      const key = `favorites_${app.state.user.id}`;
-      const favorites = JSON.parse(localStorage.getItem(key) || '[]');
-      favorites.splice(index, 1);
-      localStorage.setItem(key, JSON.stringify(favorites));
-      
-      this.loadFavorites();
-      app.notify('✅ 삭제되었습니다.', 'success');
-    }
-  },
-
-  // ========================================
-  // GAME (퀴즈)
-  // ========================================
-  game: {
-    next: function() {
-      if (DATA.games.length === 0) return;
-      
-      app.state.currentGame = DATA.games[Math.floor(Math.random() * DATA.games.length)];
-      document.getElementById('gameQuestion').textContent = "Q. " + app.state.currentGame.q;
-      document.getElementById('gameAnswer').value = '';
-      document.getElementById('gameFeedback').textContent = '';
-      
-      this.updateProgress();
-    },
-
-    check: function() {
-      const input = (document.getElementById('gameAnswer').value || '').trim().toLowerCase();
-      const game = app.state.currentGame;
-      const feedback = document.getElementById('gameFeedback');
-      
-      if (!game) {
-        feedback.textContent = '⚠️ 문제를 먼저 불러오세요.';
-        feedback.style.color = 'var(--warning)';
-        return;
-      }
-      
-      if (!input) {
-        feedback.textContent = '⚠️ 답을 입력해주세요.';
-        feedback.style.color = 'var(--warning)';
-        return;
-      }
-      
-      const answers = game.a.map(a => a.toString().toLowerCase());
-      const isCorrect = answers.some(a => input.includes(a) || a.includes(input));
-      
-      if (isCorrect) {
-        app.state.gameScore += 10;
-        app.state.gameStreak += 1;
-        feedback.textContent = `✅ 정답입니다! +10점 (연속 ${app.state.gameStreak}회)`;
-        feedback.style.color = 'var(--accent)';
-        app.notify('🎉 정답!', 'success');
-      } else {
-        app.state.gameStreak = 0;
-        feedback.textContent = `❌ 오답입니다. 정답은 "${game.a[0]}"입니다.`;
-        feedback.style.color = 'var(--danger)';
-      }
-      
-      this.updateScore();
-      this.saveStats();
-      
-      // 자동으로 다음 문제
-      setTimeout(() => this.next(), 2000);
-    },
-
-    updateScore: function() {
-      document.getElementById('gameScore').textContent = app.state.gameScore;
-      document.getElementById('gameStreak').textContent = app.state.gameStreak;
-    },
-
-    updateProgress: function() {
-      // 임의로 진행률 표시 (실제로는 문제 개수 기반)
-      const totalGames = DATA.games.length;
-      const answeredGames = Math.min(app.state.gameScore / 10, totalGames);
-      const progress = (answeredGames / totalGames) * 100;
-      document.getElementById('gameProgress').style.width = `${Math.min(progress, 100)}%`;
-    },
-
-    saveStats: function() {
-      if (!app.state.user) return;
-      
-      const key = `game_stats_${app.state.user.id}`;
-      const stats = JSON.parse(localStorage.getItem(key) || '{"bestScore":0,"bestStreak":0}');
-      
-      if (app.state.gameScore > stats.bestScore) {
-        stats.bestScore = app.state.gameScore;
-      }
-      if (app.state.gameStreak > stats.bestStreak) {
-        stats.bestStreak = app.state.gameStreak;
-      }
-      
-      localStorage.setItem(key, JSON.stringify(stats));
-      
-      document.getElementById('bestScore').textContent = stats.bestScore;
-      document.getElementById('bestStreak').textContent = stats.bestStreak;
-    },
-
-    loadStats: function() {
-      if (!app.state.user) return;
-      
-      const key = `game_stats_${app.state.user.id}`;
-      const stats = JSON.parse(localStorage.getItem(key) || '{"bestScore":0,"bestStreak":0}');
-      
-      document.getElementById('bestScore').textContent = stats.bestScore;
-      document.getElementById('bestStreak').textContent = stats.bestStreak;
-    }
-  },
-
-  // ========================================
-  // CHAT (AI 상담)
-  // ========================================
-  chat: {
-    send: async function() {
-      const input = document.getElementById('chatInput');
-      const message = (input.value || '').trim();
-      
-      if (!message) return;
-      
-      // 사용자 메시지 추가
-      this.addMessage(message, 'user');
-      input.value = '';
-      
-      // 타이핑 표시
-      const typingIndicator = document.getElementById('typingIndicator');
-      typingIndicator.classList.add('active');
-      
-      // 버튼 비활성화
-      const sendBtn = document.getElementById('chatSendBtn');
-      sendBtn.disabled = true;
-      
-      // AI 응답 생성
-      try {
-        const response = await this.getAIResponse(message);
-        
-        setTimeout(() => {
-          typingIndicator.classList.remove('active');
-          this.addMessage(response, 'ai');
-          sendBtn.disabled = false;
-        }, 500 + Math.random() * 1000);
-        
-      } catch (error) {
-        typingIndicator.classList.remove('active');
-        this.addMessage('죄송합니다. 응답 생성 중 오류가 발생했습니다. 다시 시도해주세요.', 'ai');
-        sendBtn.disabled = false;
-      }
-    },
-
-    addMessage: function(text, type) {
-      const div = document.createElement('div');
-      div.className = `chat-message ${type}`;
-      div.textContent = text;
-      
-      const history = document.getElementById('chatHistory');
-      history.appendChild(div);
-      history.scrollTop = history.scrollHeight;
-      
-      // 히스토리 저장
-      app.state.chatHistory.push({ text, type, timestamp: Date.now() });
-      if (app.state.chatHistory.length > 50) app.state.chatHistory.shift();
-    },
-
-    getAIResponse: async function(userMsg) {
-      const txt = userMsg.toLowerCase();
-      
-      // 1. 위급 상황 감지
-      const emergencyKeywords = ['자살', '죽고싶', '살고싶지', '끝내고싶', '죽을래', '자해'];
-      if (emergencyKeywords.some(k => txt.includes(k))) {
-        return "⚠️ 매우 위중한 표현이 감지되었습니다. 당신은 소중한 존재입니다.\n\n지금 즉시 도움이 필요하시다면:\n• 자살예방상담전화: 1393 (24시간)\n• 정신건강위기상담: 1577-0199\n• 생명의전화: 1588-9191\n\n전문가의 도움을 받으시길 강력히 권장합니다.";
-      }
-      
-      // 2. 키워드 매칭
-      let matchedCategories = [];
-      for (const category in DATA.aiKeywordsByCategory) {
-        const keywords = DATA.aiKeywordsByCategory[category];
-        if (keywords.some(k => txt.includes(k))) {
-          matchedCategories.push(category);
-        }
-      }
-      
-      // 3. 우선순위별 응답
-      const priority = ['stress', 'depression', 'insomnia', 'anxiety', 'fatigue', 'hunger', 'greeting', 'general'];
-      const matched = priority.find(p => matchedCategories.includes(p));
-      
-      if (matched && DATA.aiResponses[matched]) {
-        const response = DATA.aiResponses[matched];
-        return `${response.empathy}\n\n${response.solution}`;
-      }
-      
-      // 4. 현재 기분 기반 컨텍스트 응답
-      if (app.state.user) {
-        const currentMood = localStorage.getItem(`mood_${app.state.user.id}`);
-        if (currentMood === 'sad' || currentMood === 'tired' || currentMood === 'anxious') {
-          return "지금 기분이 좋지 않으신 것 같아 걱정됩니다. 😔\n\n어떤 일 때문에 그러신지 천천히 이야기해주실 수 있나요? 제가 옆에서 잘 들어드릴게요.\n\n간단한 호흡법(4초 들이쉬고, 7초 멈추고, 8초 내쉬기)이나 짧은 산책도 도움이 될 수 있어요.";
-        } else if (
