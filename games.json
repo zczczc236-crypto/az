@@ -1,0 +1,24 @@
+// generate_games.js
+const fs = require("fs");
+
+const healthQuestions = [
+  {q:"하루 권장 물 섭취량?", a:"1.5~2L"},
+  {q:"스트레스 해소 좋은 활동?", a:"산책"},
+  {q:"간단한 건강 습관?", a:"스트레칭"},
+  {q:"간단한 운동?", a:"팔굽혀펴기"},
+  {q:"짧은 명상 시간?", a:"5분"},
+  {q:"아침에 좋은 음식?", a:"계란"},
+  {q:"피로 회복 좋은 과일?", a:"바나나"},
+  {q:"오후 간식 추천?", a:"요거트"},
+  {q:"건강 유지 식사?", a:"연어"},
+  {q:"야채 권장 섭취량?", a:"400g"}
+];
+
+let games = [];
+for (let i=0; games.length<500; i++) {
+  const base = healthQuestions[i % healthQuestions.length];
+  games.push({q:`${base.q} (${Math.floor(i/healthQuestions.length)+1})`, a:base.a});
+}
+
+fs.writeFileSync("games.json", JSON.stringify(games, null, 2), "utf-8");
+console.log("games.json 생성 완료 (500개)");
