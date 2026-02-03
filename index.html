@@ -162,7 +162,7 @@ hr.sep{border:none;border-top:1px solid #eee;margin:12px 0}
       </div>
 
       <button class="action-btn" onclick="app.food.recommend('#foodResult')">랜덤 추천 받기</button>
-      <p class="small" style="margin-top:10px">*무료 데이터베이스 형식으로 5,000개 이상 건강식 생성(클라이언트 시뮬레이션)</p>
+      <p class="small" style="margin-top:10px">*데이터베이스 형식으로 5,000개 이상의 건강식 생성(클라이언트 시뮬레이션)</p>
     </div>
   </div>
 
@@ -179,7 +179,7 @@ hr.sep{border:none;border-top:1px solid #eee;margin:12px 0}
         <button class="action-btn secondary-btn" style="flex:1" onclick="app.game.next()">다음 문제</button>
       </div>
       <div id="gameFeedback" style="margin-top:12px;font-weight:700"></div>
-      <div style="margin-top:10px" class="small">문제는 변형 생성하여 600개 이상 제공됩니다.</div>
+      <div style="margin-top:10px" class="small">문제는 변형 생성하여 500개 이상 제공됩니다.</div>
     </div>
   </div>
 
@@ -208,14 +208,8 @@ hr.sep{border:none;border-top:1px solid #eee;margin:12px 0}
 </div>
 
 <script>
-// ======= 무료 시뮬레이션 데이터 =======
-const DATA = {
-  foods: [],
-  aiKeywordsByCategory: {},
-  aiResponses: {},
-  games: []
-};
-
+// 여기서부터 JS 통합
+const DATA = { foods:[], aiKeywordsByCategory:{}, aiResponses:{}, games:[] };
 const app = {
   state:{ user:null, currentGame:null },
 
@@ -228,21 +222,24 @@ const app = {
   },
 
   auth:{
-    getUsers: ()=> JSON.parse(localStorage.getItem('app_users')||'{}'),
-    saveUsers: u=>localStorage.setItem('app_users',JSON.stringify(u)),
+    getUsers: ()=>JSON.parse(localStorage.getItem('app_users')||'{}'),
+    saveUsers: u=>localStorage.setItem('app_users', JSON.stringify(u)),
+
     signup:function(){
       const id=document.getElementById('regId').value.trim();
       const pw=document.getElementById('regPw').value.trim();
       const age=document.getElementById('regAge').value.trim();
       const msgEl=document.getElementById('authMsg'); msgEl.textContent='';
-      if(!id||!pw){ msgEl.textContent='아이디와 비밀번호를 입력해주세요.';return; }
+      if(!id||!pw){ msgEl.textContent='아이디와 비밀번호를 입력해주세요.'; return; }
       const users=app.auth.getUsers();
-      if(users[id]){ msgEl.textContent='이미 존재하는 아이디입니다.';return; }
-      users[id]={pw,age:age||null,joinDate:new Date().toISOString()};
+      if(users[id]){ msgEl.textContent='이미 존재하는 아이디입니다.'; return; }
+      users[id]={pw, age:age||null, joinDate:new Date().toISOString()};
       app.auth.saveUsers(users);
       alert('회원가입 완료! 로그인 해주세요.');
       app.ui.toggleSignup(false);
+      document.getElementById('regId').value=''; document.getElementById('regPw').value=''; document.getElementById('regAge').value='';
     },
+
     login:function(){
       const id=document.getElementById('loginId').value.trim();
       const pw=document.getElementById('loginPw').value.trim();
@@ -250,49 +247,51 @@ const app = {
       const msgEl=document.getElementById('authMsg'); msgEl.textContent='';
       if(users[id]&&users[id].pw===pw){
         app.state.user={id,...users[id]};
-        localStorage.setItem('app_current_user',JSON.stringify(app.state.user));
+        localStorage.setItem('app_current_user', JSON.stringify(app.state.user));
         app.ui.onLoginSuccess();
-      }else{msgEl.textContent='아이디 또는 비밀번호가 틀렸습니다.';}
+      }else msgEl.textContent='아이디 또는 비밀번호가 틀렸습니다.';
     },
-    logout:function(){ if(!confirm('정말 로그아웃 하시겠습니까?')) return; app.state.user=null; localStorage.removeItem('app_current_user'); location.reload(); },
+
+    logout:function(){
+      if(confirm('정말 로그아웃 하시겠습니까?')){ localStorage.removeItem('app_current_user'); app.state.user=null; app.nav.go('login'); }
+    },
+
     checkSession:function(){
-      const saved=localStorage.getItem('app_current_user');
-      if(saved){ app.state.user=JSON.parse(saved); app.ui.onLoginSuccess(); }else{ app.nav.go('login'); }
+      const u=JSON.parse(localStorage.getItem('app_current_user')||'null');
+      if(u){ app.state.user=u; app.ui.onLoginSuccess(); }
     }
   },
 
   ui:{
-    toggleSignup:function(show){document.getElementById('loginBox').classList.toggle('hidden',show);document.getElementById('signupBox').classList.toggle('hidden',!show);},
+    toggleSignup:function(show){ document.getElementById('signupBox').classList.toggle('hidden',!show); document.getElementById('loginBox').classList.toggle('hidden',show); document.getElementById('authMsg').textContent=''; },
     onLoginSuccess:function(){
-      document.getElementById('userNameDisplay').textContent=app.state.user.id;
-      document.getElementById('bottomNav').classList.add('active');
       app.nav.go('home');
+      document.getElementById('bottomNav').classList.add('active');
+      document.getElementById('userNameDisplay').textContent=app.state.user.id;
     }
   },
 
   nav:{
     go:function(screen){
       document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-      const target=document.getElementById('screen-'+screen); if(target) target.classList.add('active');
+      document.getElementById('screen-'+screen).classList.add('active');
       document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
       const btn=document.querySelector('.nav-btn[data-screen="'+screen+'"]'); if(btn) btn.classList.add('active');
     }
   },
 
-  mental:{
-    setMood:function(mood){
-      const comments={
-        happy:'좋은 기분이네요! 이 에너지를 활용해 보세요.',
-        calm:'평온한 상태군요. 마음을 유지하세요.',
-        neutral:'평범한 하루인가요? 작은 즐거움을 찾아보세요.',
-        sad:'우울한 느낌이 드는군요. 잠시 쉬는 것도 좋아요.',
-        angry:'화가 나 있군요. 심호흡을 해보세요.',
-        tired:'피곤하군요. 충분한 휴식을 권장합니다.'
-      };
-      const card=document.getElementById('moodResultCard'); card.classList.remove('hidden');
-      document.getElementById('moodComment').textContent=comments[mood]||'';
-      localStorage.setItem('app_mood_'+new Date().toISOString(),mood);
-      document.getElementById('homeMoodDisplay').textContent=mood;
+  mood:{ 
+    setMood:function(m){
+      const comment=document.getElementById('moodComment');
+      const card=document.getElementById('moodResultCard');
+      const moodMap={happy:'오늘은 웃을 일이 많네요! 🌞', calm:'평온한 하루 보내시길 바랍니다 🕊️', neutral:'무난한 하루네요. 작은 변화 시도해보세요.', sad:'조금 힘든가요? 충분히 쉬어도 괜찮아요 💛', angry:'화가 나셨군요 😡, 깊게 숨쉬기 연습을 해보세요.', tired:'피곤하시군요 😴, 잠깐이라도 휴식하세요.'};
+      document.getElementById('homeMoodDisplay').textContent=m;
+      comment.textContent=moodMap[m]||'오늘 하루 어떠셨나요?';
+      card.classList.remove('hidden');
+      // 로컬 저장
+      const moods=JSON.parse(localStorage.getItem('app_moods_'+app.state.user.id)||'[]');
+      moods.push({date:new Date().toISOString(), mood:m});
+      localStorage.setItem('app_moods_'+app.state.user.id, JSON.stringify(moods));
     }
   },
 
@@ -300,89 +299,91 @@ const app = {
     save:function(){
       const sleep=document.getElementById('sleepTime').value;
       const wake=document.getElementById('wakeTime').value;
-      if(!sleep||!wake){ alert('시간을 모두 입력해주세요.'); return; }
-      const records=JSON.parse(localStorage.getItem('app_sleep_records')||'[]');
-      records.unshift({sleep,wake,date:new Date().toLocaleDateString()});
-      localStorage.setItem('app_sleep_records',JSON.stringify(records.slice(0,20)));
-      app.sleep.render();
-      alert('저장 완료!');
+      const sleepAmpm=document.getElementById('sleepAmpm').value;
+      const wakeAmpm=document.getElementById('wakeAmpm').value;
+      if(!sleep||!wake){ alert('시간을 모두 입력해주세요'); return; }
+      const rec={sleep:sleep+' '+sleepAmpm, wake:wake+' '+wakeAmpm, date:new Date().toLocaleDateString()};
+      const key='app_sleep_'+app.state.user.id;
+      const data=JSON.parse(localStorage.getItem(key)||'[]');
+      data.unshift(rec);
+      localStorage.setItem(key, JSON.stringify(data));
+      this.render();
+      alert('수면 기록 저장 완료!');
     },
     render:function(){
-      const list=document.getElementById('sleepList');
-      const records=JSON.parse(localStorage.getItem('app_sleep_records')||'[]');
-      if(records.length===0){ list.innerHTML='<li>기록이 없습니다.</li>'; return; }
-      list.innerHTML='';
-      records.forEach(r=>{ const li=document.createElement('li'); li.textContent=`${r.date} | ${r.sleep} ~ ${r.wake}`; list.appendChild(li); });
+      const key='app_sleep_'+app.state.user.id;
+      const data=JSON.parse(localStorage.getItem(key)||'[]');
+      const list=document.getElementById('sleepList'); list.innerHTML='';
+      if(!data.length){ list.innerHTML='<li>기록이 없습니다.</li>'; return; }
+      data.forEach(d=>{ const li=document.createElement('li'); li.textContent=`${d.date} | 취침: ${d.sleep}, 기상: ${d.wake}`; list.appendChild(li); });
     }
   },
 
   food:{
     recommend:function(target){
-      const el=document.querySelector(target);
-      const idx=Math.floor(Math.random()*DATA.foods.length);
-      el.textContent=DATA.foods[idx];
-    }
-  },
-
-  chat:{
-    send:function(){
-      const input=document.getElementById('chatInput');
-      const msg=input.value.trim(); if(!msg) return;
-      const hist=document.getElementById('chatHistory');
-      const userDiv=document.createElement('div'); userDiv.className='msg user'; userDiv.textContent=msg; hist.appendChild(userDiv);
-      input.value=''; hist.scrollTop=hist.scrollHeight;
-
-      // 무료 시뮬레이션 응답
-      let response='저에게 자세히 말해주세요.';
-      for(const k in DATA.aiResponses){ if(msg.includes(k)){ response=DATA.aiResponses[k]; break; } }
-      const aiDiv=document.createElement('div'); aiDiv.className='msg ai'; aiDiv.textContent=response; hist.appendChild(aiDiv);
-      hist.scrollTop=hist.scrollHeight;
+      const f=DATA.foods[Math.floor(Math.random()*DATA.foods.length)];
+      document.querySelector(target).textContent=f;
     }
   },
 
   game:{
-    current:null,
     next:function(){
-      const idx=Math.floor(Math.random()*DATA.games.length);
-      this.current=DATA.games[idx];
-      document.getElementById('gameQuestion').textContent=this.current?this.current.q:'문제를 불러오는 중...';
+      const g=DATA.games[Math.floor(Math.random()*DATA.games.length)];
+      app.state.currentGame=g;
+      document.getElementById('gameQuestion').textContent=g.q;
       document.getElementById('gameAnswer').value='';
       document.getElementById('gameFeedback').textContent='';
     },
     check:function(){
       const ans=document.getElementById('gameAnswer').value.trim().toLowerCase();
-      if(!this.current){ alert('문제를 불러와 주세요.'); return; }
-      const correct=this.current.a.toLowerCase();
-      const feedback=document.getElementById('gameFeedback');
-      if(ans===correct){ feedback.textContent='🎉 정답입니다!'; feedback.style.color='green'; }else{ feedback.textContent='❌ 오답입니다. 정답: '+this.current.a; feedback.style.color='red'; }
+      if(ans===app.state.currentGame.a.toLowerCase()) document.getElementById('gameFeedback').textContent='✅ 정답입니다!';
+      else document.getElementById('gameFeedback').textContent=`❌ 오답입니다. 정답: ${app.state.currentGame.a}`;
     }
   },
 
-  setDailyQuote:function(){
-    const quotes=['작은 변화가 큰 결과를 만듭니다.','오늘의 나를 칭찬해요!','한 걸음씩 천천히 가도 좋아요.','긍정적인 마음이 행복을 만듭니다.'];
-    document.getElementById('dailyQuote').textContent=quotes[Math.floor(Math.random()*quotes.length)];
-  },
+  chat:{
+    send:function(){
+      const input=document.getElementById('chatInput'); const text=input.value.trim(); if(!text) return;
+      const hist=document.getElementById('chatHistory');
+      const msgUser=document.createElement('div'); msgUser.className='msg user'; msgUser.textContent=text; hist.appendChild(msgUser);
+      input.value='';
+      hist.scrollTop=hist.scrollHeight;
 
-  setupNavActiveBehavior:function(){
-    const btns=document.querySelectorAll('.nav-btn');
-    btns.forEach(b=>b.addEventListener('click',()=>{ btns.forEach(x=>x.classList.remove('active')); b.classList.add('active'); }));
+      // AI 반응 시뮬레이션
+      const msgAI=document.createElement('div'); msgAI.className='msg ai';
+      msgAI.textContent=app.chat.generateResponse(text);
+      hist.appendChild(msgAI);
+      hist.scrollTop=hist.scrollHeight;
+    },
+    generateResponse:function(text){
+      const lower=text.toLowerCase();
+      if(lower.includes('힘들')) return '무척 힘드신가보네요. 잠시 숨 돌리시고, 좋아하는 음악이나 간단한 스트레칭 어떠세요?';
+      if(lower.includes('배고프')) return '식사 시간이군요! 간단한 과일이나 건강 간식도 좋습니다.';
+      if(lower.includes('졸려')) return '피곤하시군요. 짧은 낮잠이나 가벼운 휴식을 추천드려요.';
+      return '그렇군요. 조금 더 자세히 말씀해주실래요?';
+    }
   },
 
   dataGenerator:{
-    initAll:function({foods,aiKeywords,games}){
-      // 음식 DB
-      for(let i=0;i<foods;i++){ DATA.foods.push('건강식 '+(i+1)); }
-      // AI 키워드 응답
-      const sampleResponses=['좋아요!','좀 더 설명해 주세요.','음.. 이해했어요.','그렇군요!','힘든 하루였군요.'];
-      for(let i=0;i<aiKeywords;i++){ DATA.aiResponses['키워드'+i]=sampleResponses[i%sampleResponses.length]; }
-      // 게임 문제
-      for(let i=0;i<games;i++){ DATA.games.push({q:'건강 문제 '+(i+1)+'번: 올바른 선택은?', a:'정답'+(i+1)}); }
-      app.sleep.render();
+    initAll:function(opts){
+      // 음식
+      for(let i=1;i<=opts.foods;i++) DATA.foods.push(`건강식 ${i}`);
+      // 게임
+      for(let i=1;i<=opts.games;i++) DATA.games.push({q:`건강 상식 문제 ${i}`, a:`정답 ${i}`});
     }
+  },
+
+  setupNavActiveBehavior:function(){
+    document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>{ document.querySelectorAll('.nav-btn').forEach(bb=>bb.classList.remove('active')); b.classList.add('active'); }));
+  },
+
+  setDailyQuote:function(){
+    const quotes=["작은 변화가 큰 결과를 만듭니다.","오늘 하루도 화이팅!","마음을 편히 가지세요.","건강이 최우선입니다."];
+    document.getElementById('dailyQuote').textContent=quotes[Math.floor(Math.random()*quotes.length)];
   }
 };
 
-app.init();
+window.addEventListener('DOMContentLoaded',()=>{ app.init(); app.sleep.render(); });
 </script>
 </body>
 </html>
