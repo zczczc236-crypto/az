@@ -3,47 +3,52 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>멘탈·건강 관리 앱 - 풀버전</title>
+<title>건강관리 앱 - AI 상담 고퀄 SPA</title>
 <style>
-body{font-family:system-ui;background:linear-gradient(135deg,#a1c4fd,#c2e9fb);margin:0;padding:15px;}
-.card{background:white;border-radius:20px;padding:16px;margin-bottom:18px;box-shadow:0 8px 22px rgba(0,0,0,.08);}
-h2{margin:0 0 10px;font-size:18px;}
-button{padding:10px;border:none;border-radius:14px;background:#5a7cff;color:white;margin:4px 2px;width:100%;font-size:15px;cursor:pointer;}
+body{margin:0;font-family:system-ui;background:linear-gradient(135deg,#a1c4fd,#c2e9fb);}
+.container{max-width:420px;margin:0 auto;padding:15px;}
+.screen{display:none;}
+.active{display:block;}
+button{width:100%;padding:14px;margin:8px 0;border:none;border-radius:12px;background:#5a7cff;color:white;font-size:16px;cursor:pointer;transition:.2s;}
 button:hover{opacity:0.9;}
-input, select{width:100%;padding:10px;border-radius:12px;border:1px solid #ddd;box-sizing:border-box;margin-top:5px;}
-.character{font-size:70px;text-align:center;transition:.4s;}
-.small{font-size:13px;color:#666;}
-.chat-box{height:220px;overflow-y:auto;background:#f3f5fb;border-radius:14px;padding:12px;font-size:14px;}
+h2{margin:0 0 12px;}
+.character{font-size:70px;text-align:center;transition:.3s;}
+.chat-box{height:250px;overflow-y:auto;background:#f3f5fb;border-radius:14px;padding:12px;margin-bottom:10px;}
 .chat-user{text-align:right;margin:6px 0;}
 .chat-ai{text-align:left;margin:6px 0;color:#333;}
+input,select{width:100%;padding:10px;margin-top:5px;border-radius:12px;border:1px solid #ddd;box-sizing:border-box;}
+.small{font-size:13px;color:#666;}
+.backBtn{background:#888;margin-top:10px;}
 </style>
 </head>
 <body>
 
-<div class="card" id="loginCard">
-  <h2>👤 회원</h2>
-  <input id="username" placeholder="닉네임 입력">
-  <button onclick="login()">로그인 / 가입</button>
-  <p class="small" id="loginMsg"></p>
+<div class="container">
+
+<div id="home" class="screen active">
+<h2>🏠 건강관리 홈</h2>
+<button onclick="showScreen('mental')">🧠 멘탈 관리</button>
+<button onclick="showScreen('sleep')">🌙 수면 기록</button>
+<button onclick="showScreen('food')">🥗 음식 추천</button>
+<button onclick="showScreen('game')">🎮 미니게임</button>
+<button onclick="showScreen('chat')">🗨️ AI 상담</button>
 </div>
 
-<div class="card">
+<div id="mental" class="screen">
 <h2>🧍 내 캐릭터</h2>
 <div class="character" id="char">😐</div>
 <p class="small" id="charState"></p>
-</div>
-
-<div class="card">
-<h2>🧠 오늘 멘탈</h2>
+<h2>오늘 멘탈</h2>
 <button onclick="setMood('😄','좋음')">좋음</button>
 <button onclick="setMood('😐','보통')">보통</button>
 <button onclick="setMood('😢','나쁨')">나쁨</button>
 <button onclick="setMood('🥱','졸림')">졸림</button>
 <button onclick="setMood('😎','신남')">신남</button>
+<button class="backBtn" onclick="showScreen('home')">⬅️ 홈으로</button>
 <p class="small" id="moodMsg"></p>
 </div>
 
-<div class="card">
+<div id="sleep" class="screen">
 <h2>🌙 수면 기록</h2>
 <label>자는 시간</label>
 <input type="number" id="sleepStartHour" placeholder="시간 (0~12)">
@@ -53,205 +58,76 @@ input, select{width:100%;padding:10px;border-radius:12px;border:1px solid #ddd;b
 <select id="sleepEndAMPM"><option>오전</option><option>오후</option></select>
 <button onclick="saveSleep()">저장</button>
 <p class="small" id="sleepMsg"></p>
+<button class="backBtn" onclick="showScreen('home')">⬅️ 홈으로</button>
 </div>
 
-<div class="card">
+<div id="food" class="screen">
 <h2>🥗 오늘의 추천 음식</h2>
-<p id="food"></p>
+<p id="foodText"></p>
 <button onclick="recommendFood()">다시 추천</button>
+<button class="backBtn" onclick="showScreen('home')">⬅️ 홈으로</button>
 </div>
 
-<div class="card">
+<div id="game" class="screen">
 <h2>🎮 미니게임</h2>
 <p id="gameQ"></p>
 <input type="text" id="gameAns" placeholder="정답 입력">
 <button onclick="checkGame()">제출</button>
 <p class="small" id="gameMsg"></p>
+<button onclick="nextGame()">다음 문제</button>
+<button class="backBtn" onclick="showScreen('home')">⬅️ 홈으로</button>
 </div>
 
-<div class="card">
-<h2>🗨️ 멘탈 케어 AI</h2>
+<div id="chat" class="screen">
+<h2>🗨️ AI 상담</h2>
 <div class="chat-box" id="chatBox"></div>
 <input type="text" id="userChat" placeholder="말을 입력하고 엔터">
+<button class="backBtn" onclick="showScreen('home')">⬅️ 홈으로</button>
+</div>
+
 </div>
 
 <script>
-// ---------------- 캐릭터 ----------------
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
 const char=document.getElementById("char");
 const charState=document.getElementById("charState");
+let userData={mood:"😐",sleep:"",chat:[]};
+function setMood(emoji,text){char.textContent=emoji;charState.textContent="현재 상태: "+text;userData.mood=emoji;}
 
-// ---------------- 음식 1000개 실제 한국식 건강 음식 ----------------
-const foodList=[
-"닭가슴살","계란","바나나","고구마","요거트","아몬드","연어","브로콜리","귀리","시금치",
-"닭가슴살 샐러드","두부","현미밥","고등어","방울토마토","오이","사과","귤","포도","파프리카",
-"호두","치즈","저지방우유","오트밀","두유","검은콩","렌틸콩","가지","양배추","상추",
-"키위","블루베리","딸기","참치","연근","단호박","닭안심","양파","마늘","청경채",
-"미역","김","표고버섯","버섯볶음","호박","감자","토마토","오트밀바","귀리죽","아보카도","퀴노아",
-"파스타","현미파스타","새우","홍합","조개","연어스테이크","닭볶음탕","콩나물","낙지","오징어",
-"돼지고기 안심","소고기 등심","현미김밥","김치","두부조림","닭죽","소세지","닭날개","참치샐러드","연어샐러드"
-];
-// 1000개 채우기
-while(foodList.length<1000){foodList.push("건강식품"+foodList.length);}
+function saveSleep(){const start=parseInt(document.getElementById("sleepStartHour").value);const end=parseInt(document.getElementById("sleepEndHour").value);const startAMPM=document.getElementById("sleepStartAMPM").value;const endAMPM=document.getElementById("sleepEndAMPM").value;if(isNaN(start)||isNaN(end)){alert("숫자 입력!");return;}let startH=start+(startAMPM=="오후"?12:0);let endH=end+(endAMPM=="오후"?12:0);let duration=endH-startH;if(duration<=0) duration+=24;userData.sleep=duration;document.getElementById("sleepMsg").textContent=duration<6?"수면 부족 😵":duration>9?"수면 과다 😴":"적절 👍";updateCharBySleep(duration);}
+function updateCharBySleep(hours){if(hours<6){char.textContent="🥱";}else if(hours>9){char.textContent="😴";}else{char.textContent="😄";}}
 
-// ---------------- 로그인 ----------------
-let currentUser=localStorage.getItem("currentUser");
-function login(){
-  const name=document.getElementById("username").value.trim();
-  if(!name){document.getElementById("loginMsg").textContent="닉네임 입력!";return;}
-  currentUser=name;
-  localStorage.setItem("currentUser",name);
-  if(!localStorage.getItem(name)){
-    localStorage.setItem(name,JSON.stringify({mood:"😐",sleep:"",chat:[]}));
-  }
-  document.getElementById("loginMsg").textContent=name+" 님 환영!";
-  loadUser();
-}
+const foodList=["닭가슴살","계란","바나나","고구마","요거트","아몬드","연어","브로콜리","귀리","시금치","사과","오렌지","토마토","아보카도","호두","치즈","우유","콩","두부","참치"];
+while(foodList.length<2000){foodList.push("건강식품"+foodList.length);}
+function recommendFood(){document.getElementById("foodText").textContent=foodList[Math.floor(Math.random()*foodList.length)];}
+recommendFood();
 
-function loadUser(){
-  if(!currentUser) return;
-  const data=JSON.parse(localStorage.getItem(currentUser));
-  char.textContent=data.mood||"😐";
-  charState.textContent="현재 상태: "+(data.mood=="😄"?"좋음":data.mood=="😢"?"나쁨":data.mood=="🥱"?"졸림":data.mood=="😎"?"신남":"보통"));
-  const chatBox=document.getElementById("chatBox");
-  chatBox.innerHTML="";
-  data.chat.forEach(c=>{
-    chatBox.innerHTML+=`<div class="chat-user">🙂 ${c.u}</div><div class="chat-ai">🤍 ${c.a}</div>`;
-  });
-  chatBox.scrollTop=chatBox.scrollHeight;
-}
-
-// ---------------- 멘탈 ----------------
-function setMood(emoji,text){
-  if(!currentUser){alert("로그인 먼저!");return;}
-  const data=JSON.parse(localStorage.getItem(currentUser));
-  char.textContent=emoji;
-  charState.textContent="현재 상태: "+text;
-  data.mood=emoji;
-  localStorage.setItem(currentUser,JSON.stringify(data));
-}
-
-// ---------------- 수면 ----------------
-function saveSleep(){
-  if(!currentUser){alert("로그인 먼저!");return;}
-  const start=parseInt(document.getElementById("sleepStartHour").value);
-  const end=parseInt(document.getElementById("sleepEndHour").value);
-  const startAMPM=document.getElementById("sleepStartAMPM").value;
-  const endAMPM=document.getElementById("sleepEndAMPM").value;
-  if(isNaN(start)||isNaN(end)){alert("숫자를 입력하세요");return;}
-  let startH=start+(startAMPM=="오후"?12:0);
-  let endH=end+(endAMPM=="오후"?12:0);
-  let duration=endH-startH;
-  if(duration<=0) duration+=24;
-  const data=JSON.parse(localStorage.getItem(currentUser));
-  data.sleep=duration;
-  localStorage.setItem(currentUser,JSON.stringify(data));
-  document.getElementById("sleepMsg").textContent=duration<6?"수면 부족 😵":duration>9?"수면 과다 😴":"적절 👍";
-  updateCharBySleep(duration);
-}
-
-function updateCharBySleep(hours){
-  if(hours<6){char.textContent="🥱";}
-  else if(hours>9){char.textContent="😴";}
-  else{char.textContent="😄";}
-}
-
-// ---------------- 음식 추천 ----------------
-function recommendFood(){
-  document.getElementById("food").textContent=
-    foodList[Math.floor(Math.random()*foodList.length)];
-}
-
-// ---------------- 미니게임 ----------------
-let gameQList=[
-  {q:"하루 권장 물 섭취량은?",a:"1.5~2l"},
-  {q:"스트레스 해소에 좋은 활동은?",a:"산책"},
-  {q:"간단한 건강 습관?",a:"스트레칭"},
-  {q:"간단한 운동?",a:"팔굽혀펴기"},
-  {q:"하루 권장 야채 섭취량?",a:"300g"},
-  {q:"하루 권장 과일 섭취량?",a:"200g"},
-  {q:"눈 건강에 좋은 음식?",a:"블루베리"},
-  {q:"단백질 보충 음식?",a:"계란"},
-  {q:"뼈 건강 음식?",a:"두부"},
-  {q:"심장 건강 운동?",a:"걷기"}
-];
+let gameQList=[{q:"하루 권장 물 섭취량?",a:"1.5~2l"},{q:"스트레스 해소 좋은 활동?",a:"산책"},{q:"간단한 건강 습관?",a:"스트레칭"},{q:"간단한 운동?",a:"팔굽혀펴기"},{q:"하루 권장 야채 섭취량?",a:"400g"},{q:"짧은 명상 시간?",a:"5분"}];
 let currentGame;
-function nextGame(){
-  currentGame=gameQList[Math.floor(Math.random()*gameQList.length)];
-  document.getElementById("gameQ").textContent=currentGame.q;
-  document.getElementById("gameAns").value="";
-  document.getElementById("gameMsg").textContent="";
-}
-function checkGame(){
-  const ans=document.getElementById("gameAns").value.trim().toLowerCase();
-  if(ans==currentGame.a.toLowerCase()){
-    document.getElementById("gameMsg").textContent="정답! 멘탈 회복 😄";
-    char.textContent="😄";
-  } else {
-    document.getElementById("gameMsg").textContent="틀렸어요 😢 정답: "+currentGame.a;
-    char.textContent="😢";
-  }
-  nextGame();
-}
+function nextGame(){currentGame=gameQList[Math.floor(Math.random()*gameQList.length)];document.getElementById("gameQ").textContent=currentGame.q;document.getElementById("gameAns").value="";document.getElementById("gameMsg").textContent="";}
+function checkGame(){const ans=document.getElementById("gameAns").value.trim().toLowerCase();if(ans==currentGame.a.toLowerCase()){document.getElementById("gameMsg").textContent="정답! 해결 방법 수행 완료 😄";char.textContent="😄";}else{document.getElementById("gameMsg").textContent="틀렸어요 😢 정답: "+currentGame.a;char.textContent="😢";}nextGame();}
 nextGame();
 
-// ---------------- AI 대화 50+ 패턴 ----------------
+const chatBox=document.getElementById("chatBox");
 const aiResponses=[
-  {k:["힘들","피곤","졸림"],r:"버텨온 네가 대단해 😢 잠시 쉬어도 돼요."},
-  {k:["불안","걱정","초조"],r:"지금은 안전해. 천천히 숨 쉬어 😟"},
-  {k:["행복","좋음","즐거움"],r:"좋은 감정 오래 기억해요 😊"},
-  {k:["우울","슬픔","눈물"],r:"조금만 쉬어도 괜찮아요 😢 내가 여기 있어요."},
-  {k:["신남","재미","설렘"],r:"와! 신나는 하루네요 😎"},
-  {k:["화","짜증","분노"],r:"심호흡 한번 해봐요 😤"},
-  {k:["공부","집중","시험"],r:"조금씩 천천히 해요 📚"},
-  {k:["스트레스","긴장"],r:"스트레스는 잠시 내려놓아요 🌿"},
-  {k:["혼자","외로워","쓸쓸"],r:"여기 내가 있어요 😊"},
-  {k:["식사","배고픔"],r:"잘 챙겨 먹는 것도 중요해요 🍽️"},
-  {k:["운동","체력"],r:"조금 움직이는 것도 좋아요 🏃‍♂️"},
-  {k:["잠","수면"],r:"충분한 휴식이 필요해요 💤"},
-  {k:["목표","도전"],r:"조금씩 이뤄가면 돼요 💪"},
-  {k:["자기계발","공부"],r:"작은 성취도 칭찬해요 🌟"},
-  {k:["취미","즐거움"],r:"좋아하는 걸 해보세요 🎨"},
-  {k:["건강","체중"],r:"건강 체크도 잊지 마요 🥗"},
-  {k:["친구","사람"],r:"말해도 괜찮아요 🙂"},
-  {k:["미래","걱정"],r:"하나씩 준비해보세요 📝"},
-  {k:["기분","상태"],r:"감정 기록도 좋아요 ✨"},
-  {k:["노력","성장"],r:"지금도 충분히 잘하고 있어요 👍"}
-  // 추가 30+개 가능
+{k:["힘들","피곤","졸림"],rType:"응원",r:"힘든가 보네요. 잠깐 눈을 붙이거나 스트레칭을 해보세요. 응원합니다! 💪"},
+{k:["불안","걱정","초조"],rType:"도움",r:"심호흡과 5분 명상을 해보세요. 마음이 안정됩니다."},
+{k:["우울","슬픔","눈물"],rType:"응원",r:"가벼운 산책이나 음악 듣기를 추천합니다. 힘내세요! 🌈"},
+{k:["집중","공부"],rType:"도움",r:"작은 목표를 나누어 달성해보세요. 집중력이 올라갑니다."},
+{k:["짜증","화","분노"],rType:"응원",r:"5초 심호흡 후 물 한잔. 감정을 천천히 풀어보세요."},
+{k:["배고픔","공복"],rType:"도움",r:"단백질이나 과일을 섭취하세요. 에너지가 회복됩니다."},
+{k:["목마름","갈증"],rType:"도움",r:"물을 천천히 1컵 이상 마셔보세요."},
+{k:["스트레스"],rType:"응원",r:"스트레스 해소에는 짧은 산책이나 그림 그리기를 추천합니다."},
+{k:["피곤"],rType:"도움",r:"가벼운 스트레칭과 물 섭취로 회복 가능합니다."},
+{k:["긴장"],rType:"도움",r:"눈을 감고 깊게 숨 3번, 긴장이 풀립니다."}
 ];
-
 document.getElementById("userChat").addEventListener("keydown",function(e){
-  if(e.key==="Enter"){
-    const msg=this.value.trim();
-    if(!msg) return;
-    this.value="";
-    if(!currentUser){alert("로그인 먼저!");return;}
-    const chatBox=document.getElementById("chatBox");
-    const data=JSON.parse(localStorage.getItem(currentUser));
-    chatBox.innerHTML+=`<div class="chat-user">🙂 ${msg}</div>`;
-    let reply="응, 계속 말해봐 🙂";
-    const m=msg.toLowerCase();
-    for(let i=0;i<aiResponses.length;i++){
-      if(aiResponses[i].k.some(kw=>m.includes(kw))){
-        reply=aiResponses[i].r;
-        break;
-      }
-    }
-    if(reply==="응, 계속 말해봐 🙂"){
-      const responses=["응","맞아","그렇구나","계속 말해봐","잘 하고 있어"];
-      reply=responses[Math.floor(Math.random()*responses.length)];
-    }
-    chatBox.innerHTML+=`<div class="chat-ai">🤍 ${reply}</div>`;
-    chatBox.scrollTop=chatBox.scrollHeight;
-    data.chat.push({u:msg,a:reply});
-    localStorage.setItem(currentUser,JSON.stringify(data));
-  }
+if(e.key==="Enter"){const msg=this.value.trim(); if(!msg)return; this.value=""; chatBox.innerHTML+=`<div class="chat-user">🙂 ${msg}</div>`; let reply="조금만 더 구체적으로 말해줄래요?"; const m=msg.toLowerCase(); for(let i=0;i<aiResponses.length;i++){if(aiResponses[i].k.some(kw=>m.includes(kw))){reply=aiResponses[i].r;break;}} chatBox.innerHTML+=`<div class="chat-ai">🤍 ${reply}</div>`; chatBox.scrollTop=chatBox.scrollHeight; userData.chat.push({u:msg,a:reply});}
 });
-
-// ---------------- 자동 로그인 ----------------
-if(currentUser){loadUser();}
 </script>
+
 </body>
 </html>
-
 
 <!-- deploy test -->
