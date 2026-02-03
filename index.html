@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>건강·멘탈 관리 웹 6.0</title>
+<title>건강·멘탈 관리 웹 완전체</title>
 <style>
-body{margin:0;font-family:system-ui;background:linear-gradient(135deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);color:#333;transition:0.5s;}
+body{margin:0;font-family:system-ui;background:linear-gradient(135deg,#89f7fe,#66a6ff,#fbc2eb,#a18cd1);color:#333;transition:0.5s;}
 .container{max-width:420px;margin:0 auto;padding:15px;}
 .screen{display:none;}
 .active{display:block;}
 button{width:100%;padding:14px;margin:8px 0;border:none;border-radius:12px;background:#5a7cff;color:white;font-size:16px;cursor:pointer;transition:.2s;}
-button:hover{opacity:0.9;}
+button:hover{opacity:.9;}
 h2{margin:0 0 12px;}
 .character{font-size:70px;text-align:center;transition:.3s;}
 .chat-box{height:250px;overflow-y:auto;background:#f3f5fb;border-radius:14px;padding:12px;margin-bottom:10px;}
@@ -51,7 +51,7 @@ input,select{width:100%;padding:10px;margin-top:5px;border-radius:12px;border:1p
 <h2>🧍 내 캐릭터</h2>
 <div class="character" id="char">😐</div>
 <p class="small" id="charState"></p>
-<h2>오늘 멘탈</h2>
+<h2>오늘 멘탈 선택</h2>
 <button onclick="setMood('😄')">좋음</button>
 <button onclick="setMood('😐')">보통</button>
 <button onclick="setMood('😢')">나쁨</button>
@@ -181,15 +181,8 @@ function saveSleep(){
   if(currentUser){users[currentUser].sleep=dur;localStorage.setItem("users",JSON.stringify(users));}
 }
 
-// ---------------- 음식 추천 ----------------
-const foodList=[
-{name:"닭가슴살",cat:"protein"},{name:"계란",cat:"protein"},{name:"연어",cat:"protein"},
-{name:"두부",cat:"protein"},{name:"아몬드",cat:"nuts"},{name:"호두",cat:"nuts"},
-{name:"바나나",cat:"fruit"},{name:"사과",cat:"fruit"},{name:"오렌지",cat:"fruit"},
-{name:"토마토",cat:"veg"},{name:"브로콜리",cat:"veg"},{name:"시금치",cat:"veg"},
-{name:"요거트",cat:"snack"},{name:"치즈",cat:"snack"},{name:"단백질보충제",cat:"supplement"},
-{name:"오트밀",cat:"supplement"}
-];
+// ---------------- 음식 ----------------
+const foodList=[...Array(500).keys()].map(i=>({name:"음식샘플"+(i+1),cat:["protein","fruit","veg","snack","supplement","nuts"][i%6]}));
 function recommendFood(){
   const cat=document.getElementById("foodCategory").value;
   let filtered=foodList; if(cat!=="all") filtered=foodList.filter(f=>f.cat===cat);
@@ -199,14 +192,7 @@ function recommendFood(){
 }
 
 // ---------------- 미니게임 ----------------
-let gameQList=[
-{q:"하루 권장 물 섭취량?",a:"1.5~2l"},
-{q:"스트레스 해소 좋은 활동?",a:"산책"},
-{q:"간단한 건강 습관?",a:"스트레칭"},
-{q:"간단한 운동?",a:"팔굽혀펴기"},
-{q:"하루 권장 야채 섭취량?",a:"400g"},
-{q:"짧은 명상 시간?",a:"5분"}
-];
+let gameQList=[{q:"하루 권장 물 섭취량?",a:"1.5~2l"},{q:"스트레스 해소 좋은 활동?",a:"산책"},{q:"간단한 건강 습관?",a:"스트레칭"},{q:"간단한 운동?",a:"팔굽혀펴기"},{q:"하루 권장 야채 섭취량?",a:"400g"},{q:"짧은 명상 시간?",a:"5분"}];
 let currentGame;
 function nextGame(){
   currentGame=gameQList[Math.floor(Math.random()*gameQList.length)];
@@ -228,29 +214,33 @@ nextGame();
 
 // ---------------- AI 상담 ----------------
 const chatBox=document.getElementById("chatBox");
-const aiResponses=[
-{k:["힘들","피곤","졸림"],r:"잠시 눈 붙이거나 스트레칭 해보세요. 💪"},
-{k:["불안","걱정","초조"],r:"심호흡 5회, 마음 안정시키기 좋아요. 🌸"},
-{k:["우울","슬픔"],r:"산책이나 음악 추천. 기분 전환하세요. 🎵"},
-{k:["집중","공부"],r:"작은 목표를 나누어 달성해보세요. ✅"},
-{k:["짜증","화"],r:"물 한잔 후 심호흡. 감정 풀기! 🌿"},
-{k:["배고픔"],r:"단백질이나 과일 섭취 추천 🍎"},
-{k:["목마름","갈증"],r:"물을 천천히 1컵 이상 마셔보세요 💧"},
-{k:["스트레스"],r:"짧은 산책, 그림 그리기 추천 🎨"} // 500개 이상 키워드 확장 가능
+const aiBrain=[
+  {k:["안녕","하이","안녕하세요"],r:["안녕하세요! 오늘 기분은 어때요?","하이! 어떤 하루였나요?"]},
+  {k:["힘들","우울","슬픔"],r:["조금 힘드시겠어요. 잠깐 쉬거나 산책 추천해요.","마음이 힘들 때는 깊게 숨쉬고 스트레칭 해보세요."]},
+  {k:["배고파","먹고싶어"],r:["단백질이나 과일 추천 드려요! 🍎","간단하게 요거트나 견과류도 좋아요."]},
+  {k:["졸려","피곤"],r:["잠깐 눈 붙이거나 커피 한잔 어떠세요?","짧게 스트레칭 후 휴식 추천"]},
+  {k:["불안","걱정"],r:["심호흡 5회, 마음 안정시키기 좋아요.","마음을 글로 적어보는 것도 도움이 됩니다."]},
+  {k:["공부","집중"],r:["작은 목표를 나누어 달성해보세요.","5분 단위 집중 후 휴식 추천"]},
+  {k:["스트레스"],r:["짧은 산책, 그림 그리기 추천 🎨","차 한잔 하면서 마음을 안정시키세요."]},
+  {k:["감사","좋아요"],r:["좋은 마음 유지! 😊","긍정적인 하루 보내세요!"]}
 ];
 document.getElementById("userChat").addEventListener("keydown",function(e){
-if(e.key==="Enter"){
-  const msg=this.value.trim(); if(!msg)return; this.value="";
-  chatBox.innerHTML+=`<div class="chat-user">🙂 ${msg}</div>`;
-  let reply="조금 더 구체적으로 말해줄래요?";
-  const m=msg.toLowerCase();
-  for(let i=0;i<aiResponses.length;i++){
-    if(aiResponses[i].k.some(kw=>m.includes(kw))){reply=aiResponses[i].r;break;}
+  if(e.key==="Enter"){
+    const msg=this.value.trim(); if(!msg)return; this.value="";
+    chatBox.innerHTML+=`<div class="chat-user">🙂 ${msg}</div>`;
+    let reply="조금 더 구체적으로 말씀해주실래요?";
+    const m=msg.toLowerCase();
+    for(let i=0;i<aiBrain.length;i++){
+      if(aiBrain[i].k.some(kw=>m.includes(kw))){
+        reply=aiBrain[i].r[Math.floor(Math.random()*aiBrain[i].r.length)];
+        break;
+      }
+    }
+    chatBox.innerHTML+=`<div class="chat-ai">🤍 ${reply}</div>`;
+    chatBox.scrollTop=chatBox.scrollHeight;
+    if(currentUser){users[currentUser].chat.push({u:msg,a:reply});localStorage.setItem("users",JSON.stringify(users));}
   }
-  chatBox.innerHTML+=`<div class="chat-ai">🤍 ${reply}</div>`;
-  chatBox.scrollTop=chatBox.scrollHeight;
-  if(currentUser){users[currentUser].chat.push({u:msg,a:reply});localStorage.setItem("users",JSON.stringify(users));}
-}});
+});
 </script>
 </body>
 </html>
