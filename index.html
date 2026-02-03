@@ -1,310 +1,214 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>무료 웹 앱 - 음식 추천, AI 상담, 건강 퀴즈</title>
-  <style>
-    /* 기본 스타일 및 모바일 대응 CSS */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: #f5f5f5; color: #333; transition: background 0.3s, color 0.3s; }
-    .dark { background: #333; color: #f5f5f5; }
-    header { background: #4CAF50; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; color: white; }
-    header h1 { font-size: 1.5em; }
-    nav button { margin: 0 5px; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; background: #66BB6A; color: white; }
-    nav button:hover { background: #81C784; }
-    .section { display: none; padding: 20px; }
-    .active { display: block; }
-    /* 폼, 버튼 및 입력 필드 스타일 */
-    input[type="text"], input[type="password"] {
-      padding: 8px;
-      margin: 5px 0;
-      width: 90%;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    button { padding: 10px 15px; margin: 5px 0; border: none; border-radius: 4px; cursor: pointer; background: #4CAF50; color: white; }
-    button:hover { background: #45A049; }
-    .output { margin-top: 10px; padding: 10px; background: #eee; border-radius: 4px; min-height: 30px; }
-    /* 로그인/회원가입 모달 및 영역 */
-    #loginSection { max-width: 400px; margin: 20px auto; padding: 20px; background: white; border: 1px solid #ccc; border-radius: 4px; }
-    /* Settings 영역 */
-    #settingsSection button { background: #FF9800; }
-    /* 모바일 대응 미디어 쿼리 */
-    @media (max-width: 600px) {
-      header { flex-direction: column; }
-      nav button { margin: 5px 0; }
-    }
-    /* alarm mode: 간단한 깜빡임 효과 */
-    .alarm {
-      animation: blink 1s step-start infinite;
-    }
-    @keyframes blink {
-      50% { opacity: 0; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마음 챙김 & 건강 Pro</title>
+<style>
+:root { --primary:#6366f1;--primary-dark:#4f46e5;--accent:#10b981;--accent-dark:#059669;--danger:#ef4444;--danger-dark:#dc2626;--bg:#f9fafb;--bg-dark:#111827;--card:#fff;--card-dark:#1f2937;--text:#1f2937;--text-dark:#f9fafb;--text-muted:#6b7280;--text-muted-dark:#9ca3af;--border:#e5e7eb;--border-dark:#374151;--shadow:rgba(0,0,0,0.1);--shadow-dark:rgba(0,0,0,0.3);--transition:all 0.3s cubic-bezier(0.4,0,0.2,1);}
+[data-theme="dark"]{--bg:var(--bg-dark);--card:var(--card-dark);--text:var(--text-dark);--text-muted:var(--text-muted-dark);--border:var(--border-dark);--shadow:var(--shadow-dark);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Malgun Gothic,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;transition:var(--transition);}
+.app-container{max-width:480px;margin:0 auto;min-height:100vh;background:var(--card);box-shadow:0 0 40px var(--shadow);display:flex;flex-direction:column;position:relative;}
+header{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;padding:20px;text-align:center;box-shadow:0 4px 12px rgba(99,102,241,0.3);position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;}
+header h1{font-size:1.25rem;font-weight:700;flex:1;}
+.theme-toggle{background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.5rem;width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition);}
+.theme-toggle:hover{background:rgba(255,255,255,0.3);transform: scale(1.1);}
+.screen{display:none;padding:20px;padding-bottom:100px;flex:1;overflow-y:auto;animation:fadeIn 0.3s ease-in;}
+.screen.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.card{background:var(--card);border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px var(--shadow);border:1px solid var(--border);transition:var(--transition);}
+.card:hover{box-shadow:0 4px 16px var(--shadow);transform:translateY(-2px);}
+.card h2{font-size:1.25rem;margin-bottom:12px;color:var(--text);}
+.card h3{font-size:1.1rem;margin-bottom:10px;color:var(--text);}
+.btn{width:100%;padding:14px 20px;border:none;border-radius:12px;font-weight:600;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:var(--transition);}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;}
+.btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 4px 12px rgba(99,102,241,0.4);}
+.btn-secondary{background:var(--bg);color:var(--primary);border:2px solid var(--primary);}
+.btn-secondary:hover:not(:disabled){background:var(--primary);color:white;}
+.btn-danger{background:linear-gradient(135deg,var(--danger),var(--danger-dark));color:white;}
+.btn-danger:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 4px 12px rgba(239,68,68,0.4);}
+.btn-accent{background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:white;}
+.btn-accent:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 4px 12px rgba(16,185,129,0.4);}
+.btn:disabled{opacity:0.5;cursor:not-allowed;}
+.btn-group{display:flex;gap:10px;}
+.btn-group .btn{flex:1;}
+input, select, textarea{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:10px;font-size:1rem;background:var(--card);color:var(--text);transition:var(--transition);font-family:inherit;}
+input:focus, select:focus, textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(99,102,241,0.1);}
+.input-group{margin-bottom:12px;}
+.input-group label{display:block;margin-bottom:6px;font-weight:600;color:var(--text);}
+.mood-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px;}
+.mood-btn{background:var(--bg);border:3px solid var(--border);border-radius:16px;padding:20px;font-size:2.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition);aspect-ratio:1;}
+.mood-btn:hover{transform:scale(1.1);border-color:var(--primary);box-shadow:0 4px 12px var(--shadow);}
+.mood-btn:active{transform:scale(0.95);}
+.list{list-style:none;padding:0;margin:0;}
+.list-item{padding:12px;border-bottom:1px solid var(--border);transition:var(--transition);}
+.list-item:last-child{border-bottom:none;}
+.list-item:hover{background:var(--bg);}
+.food-result{background:var(--bg);padding:20px;border-radius:12px;text-align:center;font-size:1.3rem;font-weight:700;color:var(--primary);min-height:80px;display:flex;align-items:center;justify-content:center;transition:var(--transition);}
+.food-result.animating{animation:foodPulse 0.5s ease-in-out;}
+@keyframes foodPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+.quiz-card{margin-top:10px;}
+.hidden{display:none;}
+</style>
 </head>
 <body>
-  <!-- 헤더 및 네비게이션 -->
-  <header>
-    <h1>무료 웹 앱</h1>
-    <nav>
-      <button data-target="loginSection">로그인/회원가입</button>
-      <button data-target="foodSection">음식 추천</button>
-      <button data-target="aiSection">AI 상담</button>
-      <button data-target="quizSection">건강 퀴즈</button>
-      <button data-target="settingsSection">설정</button>
-    </nav>
-  </header>
-  
-  <!-- 로그인/회원가입 섹션 -->
-  <section id="loginSection" class="section active">
-    <h2>로그인 / 회원가입</h2>
-    <div id="userStatus">
-      <!-- 로그인 상태를 보여줌 -->
-      <p>현재 로그인 상태: <span id="statusText">로그인되지 않음</span></p>
-    </div>
-    <form id="authForm">
-      <input type="text" id="username" placeholder="아이디 입력" required>
-      <input type="password" id="password" placeholder="비밀번호 입력" required>
-      <div>
-        <button type="button" id="loginBtn">로그인</button>
-        <button type="button" id="signupBtn">회원가입</button>
-        <button type="button" id="logoutBtn" style="display:none; background: #f44336;">로그아웃</button>
-      </div>
-    </form>
-    <div id="authMessage" class="output"></div>
-  </section>
-  
-  <!-- 음식 추천 섹션 -->
-  <section id="foodSection" class="section">
-    <h2>랜덤 음식 추천</h2>
-    <button id="recommendFoodBtn">음식 추천 받기</button>
-    <div id="foodOutput" class="output"></div>
-  </section>
-  
-  <!-- AI 감정 상담 섹션 -->
-  <section id="aiSection" class="section">
-    <h2>AI 감정 상담</h2>
-    <select id="emotionSelect">
-      <option value="happy">행복해요</option>
-      <option value="sad">슬퍼요</option>
-      <option value="anxious">불안해요</option>
-    </select>
-    <button id="getCounselingBtn">상담 메시지 확인</button>
-    <div id="aiOutput" class="output"></div>
-  </section>
-  
-  <!-- 건강 퀴즈 섹션 -->
-  <section id="quizSection" class="section">
-    <h2>건강 상식 퀴즈</h2>
-    <button id="newQuestionBtn">새 문제 받기</button>
-    <div id="quizQuestion" class="output" style="min-height:50px;"></div>
-    <input type="text" id="quizAnswer" placeholder="답을 입력하세요">
-    <button id="submitAnswerBtn">정답 제출</button>
-    <div id="resultOutput" class="output"></div>
-  </section>
-  
-  <!-- 설정 및 추가 기능 섹션 -->
-  <section id="settingsSection" class="section">
-    <h2>설정</h2>
-    <button id="toggleDarkModeBtn">다크 모드 전환</button>
-    <button id="toggleAlarmModeBtn">알람 모드 전환</button>
-    <button id="resetOutputsBtn">출력 초기화</button>
-  </section>
-  
-  <!-- JavaScript: 기능 및 데이터 로직 -->
-  <script>
-    // 데이터 배열들 및 객체 설정
-    // 음식 데이터 배열 (한국식 음식 중심)
-    const foods = ["비빔밥", "김치찌개", "떡볶이", "불고기", "된장찌개", "칼국수", "삼계탕", "냉면"];
+<div class="app-container">
 
-    // 감정별 AI 상담 메시지
-    const aiResponses = {
-      happy: ["행복은 나누면 두 배가 됩니다!", "당신의 미소는 주변을 환하게 만듭니다."],
-      sad: ["힘든 날도 있지만 내일은 더 나아질 거예요.", "슬픔을 이겨내면 더 강해질 수 있습니다."],
-      anxious: ["불안은 잠시 뿐, 지금 이 순간에 집중하세요.", "마음을 가라앉히고 심호흡 해보세요."]
-    };
+<header>
+<h1 id="headerTitle">마음 챙김 & 건강 Pro</h1>
+<button class="theme-toggle" onclick="app.toggleTheme()" aria-label="테마 전환"><span id="themeIcon">🌙</span></button>
+</header>
 
-    // 건강 상식 퀴즈 데이터 배열
-    const quizQuestions = [
-      { question: "한국인의 하루 권장 소금 섭취량은 얼마인가요?", answer: "5g미만" },
-      { question: "한국 전통 발효 음식은 무엇인가요?", answer: "김치" },
-      { question: "하루에 필요한 물 섭취량은 얼마나 되나요?", answer: "2리터" }
-    ];
-    
-    // 현재 퀴즈 문제를 보관할 변수
-    let currentQuestion = null;
-    
-    // 로그인 상태 관리
-    function updateUserStatus() {
-      const loggedIn = localStorage.getItem('loggedIn');
-      const statusText = document.getElementById('statusText');
-      const logoutBtn = document.getElementById('logoutBtn');
-      if(loggedIn === 'true') {
-        statusText.textContent = localStorage.getItem('username');
-        logoutBtn.style.display = 'inline-block';
-      } else {
-        statusText.textContent = "로그인되지 않음";
-        logoutBtn.style.display = 'none';
-      }
-    }
-    
-    // 랜덤 인덱스 반환 함수
-    function randomIndex(arr) {
-      return Math.floor(Math.random() * arr.length);
-    }
-    
-    // 음식 추천 함수
-    function getRandomFood() {
-      const food = foods[randomIndex(foods)];
-      document.getElementById("foodOutput").innerText = food;
-    }
-    
-    // AI 상담 메시지 함수
-    function getRandomAIResponse() {
-      const emotion = document.getElementById("emotionSelect").value;
-      const messages = aiResponses[emotion];
-      if(messages && messages.length > 0) {
-        document.getElementById("aiOutput").innerText = messages[randomIndex(messages)];
-      } else {
-        document.getElementById("aiOutput").innerText = "해당 감정에 대한 상담 메시지가 없습니다.";
-      }
-    }
-    
-    // 건강 퀴즈 문제 불러오기
-    function loadQuizQuestion() {
-      currentQuestion = quizQuestions[randomIndex(quizQuestions)];
-      document.getElementById("quizQuestion").innerText = currentQuestion.question;
-      document.getElementById("resultOutput").innerText = "";
-      document.getElementById("quizAnswer").value = "";
-    }
-    
-    // 퀴즈 정답 확인 함수 (대소문자 구분 없이 공백 제거)
-    function checkQuizAnswer() {
-      const userAnswer = document.getElementById("quizAnswer").value.trim().toLowerCase();
-      const correctAnswer = currentQuestion.answer.trim().toLowerCase();
-      if(userAnswer === correctAnswer) {
-        document.getElementById("resultOutput").innerText = "정답입니다!";
-      } else {
-        document.getElementById("resultOutput").innerText = "오답입니다. 정답은: " + currentQuestion.answer;
-      }
-    }
-    
-    // 회원가입 함수 (간단한 로컬스토리지에 저장)
-    function signupUser() {
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
-      if(username === "" || password === "") {
-        document.getElementById("authMessage").innerText = "모든 필드를 입력하세요.";
-        return;
-      }
-      // 기존 계정 있는지 확인
-      if(localStorage.getItem('user_' + username)) {
-        document.getElementById("authMessage").innerText = "이미 존재하는 아이디입니다.";
-      } else {
-        localStorage.setItem('user_' + username, password);
-        document.getElementById("authMessage").innerText = "회원가입 성공! 이제 로그인하세요.";
-      }
-    }
-    
-    // 로그인 함수
-    function loginUser() {
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
-      if(username === "" || password === "") {
-        document.getElementById("authMessage").innerText = "모든 필드를 입력하세요.";
-        return;
-      }
-      const storedPassword = localStorage.getItem('user_' + username);
-      if(storedPassword && storedPassword === password) {
-        localStorage.setItem('loggedIn', 'true');
-        localStorage.setItem('username', username);
-        document.getElementById("authMessage").innerText = "로그인 성공!";
-        updateUserStatus();
-      } else {
-        document.getElementById("authMessage").innerText = "아이디 또는 비밀번호가 틀렸습니다.";
-      }
-    }
-    
-    // 로그아웃 함수
-    function logoutUser() {
-      localStorage.setItem('loggedIn', 'false');
-      localStorage.removeItem('username');
-      document.getElementById("authMessage").innerText = "로그아웃되었습니다.";
-      updateUserStatus();
-    }
-    
-    // 다크 모드 토글
-    function toggleDarkMode() {
-      document.body.classList.toggle("dark");
-    }
-    
-    // 알람 모드 토글 (헤더에 알람 효과 적용)
-    let isAlarmOn = false;
-    function toggleAlarmMode() {
-      isAlarmOn = !isAlarmOn;
-      const header = document.querySelector("header");
-      if(isAlarmOn) {
-        header.classList.add("alarm");
-      } else {
-        header.classList.remove("alarm");
-      }
-    }
-    
-    // 출력 초기화 기능
-    function resetOutputs() {
-      document.getElementById("foodOutput").innerText = "";
-      document.getElementById("aiOutput").innerText = "";
-      document.getElementById("quizQuestion").innerText = "";
-      document.getElementById("resultOutput").innerText = "";
-      document.getElementById("quizAnswer").value = "";
-    }
-    
-    // 화면 섹션 전환 함수 (SPA 방식)
-    function showSection(sectionId) {
-      const sections = document.querySelectorAll(".section");
-      sections.forEach(sec => {
-        if(sec.id === sectionId) {
-          sec.classList.add("active");
-        } else {
-          sec.classList.remove("active");
-        }
+<!-- LOGIN SCREEN -->
+<div id="screen-login" class="screen active">
+<div class="card text-center" style="margin-top:60px;">
+<div style="font-size:4rem;margin-bottom:16px;">🧘</div>
+<h2>환영합니다</h2>
+<p class="text-muted mb-2">AI와 함께하는 건강한 몸과 마음</p>
+<div id="loginBox">
+<div class="input-group"><input id="loginId" type="text" placeholder="아이디"></div>
+<div class="input-group"><input id="loginPw" type="password" placeholder="비밀번호"></div>
+<button class="btn btn-primary mb-1" onclick="app.auth.login()">로그인</button>
+<button class="btn btn-secondary" onclick="app.ui.toggleSignup(true)">회원가입</button>
+</div>
+<div id="signupBox" class="hidden">
+<div class="input-group"><input id="regId" type="text" placeholder="아이디"></div>
+<div class="input-group"><input id="regPw" type="password" placeholder="비밀번호"></div>
+<div class="input-group"><input id="regAge" type="number" placeholder="나이" min="1" max="150"></div>
+<button class="btn btn-primary mb-1" onclick="app.auth.signup()">가입하기</button>
+<button class="btn btn-secondary" onclick="app.ui.toggleSignup(false)">로그인으로</button>
+</div>
+<p id="authMsg" class="text-muted mt-1" style="color: var(--danger);"></p>
+</div>
+</div>
+
+<!-- HOME SCREEN -->
+<div id="screen-home" class="screen">
+<div class="card">
+<h2>👋 안녕하세요, <span id="userNameDisplay">게스트</span>님!</h2>
+<p id="greetingMsg" class="text-muted">오늘도 건강한 하루 되세요.</p>
+</div>
+
+<div class="card" style="cursor:pointer;" onclick="app.nav.go('mental')">
+<h2>💗 현재 기분</h2>
+<div id="homeMoodDisplay" class="stat-value" style="font-size:1.5rem;">기록 없음</div>
+<p class="text-muted text-small">탭하여 기록하기</p>
+</div>
+
+<div class="card">
+<h2>🍽 오늘의 추천 식단</h2>
+<div id="homeFoodResult" class="food-result">추천받아보세요</div>
+<div class="btn-group mt-1">
+<button class="btn btn-accent" onclick="app.food.recommend('#homeFoodResult')">추천받기</button>
+<button class="btn btn-secondary" onclick="app.food.recommend('#homeFoodResult')">다시</button>
+</div>
+</div>
+
+<div class="card" style="cursor:pointer;" onclick="app.nav.go('sleep')">
+<h2>🛌 수면 체크</h2>
+<p class="text-muted">오늘 밤 충분히 잤나요?</p>
+</div>
+
+<div class="card" style="cursor:pointer;" onclick="app.nav.go('quiz')">
+<h2>📝 정신 건강 자가진단</h2>
+<p class="text-muted">퀴즈로 체크해보세요</p>
+</div>
+
+<div class="card" style="cursor:pointer;" onclick="app.auth.logout()">
+<h2>🚪 로그아웃</h2>
+</div>
+
+</div>
+
+<!-- MENTAL SCREEN -->
+<div id="screen-mental" class="screen">
+<div class="card">
+<h2>💗 오늘의 기분 기록</h2>
+<div class="mood-grid">
+<button class="mood-btn" onclick="app.mood.record('😄')">😄</button>
+<button class="mood-btn" onclick="app.mood.record('🙂')">🙂</button>
+<button class="mood-btn" onclick="app.mood.record('😐')">😐</button>
+<button class="mood-btn" onclick="app.mood.record('😔')">😔</button>
+<button class="mood-btn" onclick="app.mood.record('😢')">😢</button>
+<button class="mood-btn" onclick="app.mood.record('😡')">😡</button>
+</div>
+<button class="btn btn-secondary mt-2" onclick="app.nav.go('home')">홈으로</button>
+</div>
+</div>
+
+<!-- SLEEP SCREEN -->
+<div id="screen-sleep" class="screen">
+<div class="card">
+<h2>🛌 수면 체크</h2>
+<div class="input-group"><label>몇 시간 잤나요?</label><input id="sleepInput" type="number" placeholder="예: 7" min="0" max="24"></div>
+<button class="btn btn-accent" onclick="app.sleep.record()">기록하기</button>
+<button class="btn btn-secondary mt-2" onclick="app.nav.go('home')">홈으로</button>
+<div id="sleepMsg" class="text-muted mt-2"></div>
+</div>
+</div>
+
+<!-- QUIZ SCREEN -->
+<div id="screen-quiz" class="screen">
+<div class="card">
+<h2>📝 정신 건강 자가진단</h2>
+<div id="quizContainer"></div>
+<button class="btn btn-secondary mt-2" onclick="app.nav.go('home')">홈으로</button>
+</div>
+</div>
+
+</div>
+
+<script>
+const app = {
+  theme:'light',
+  user:{name:'게스트', mood:'', moods:[], foodHistory:[], sleep:[]},
+  nav:{go:(id)=>{document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');}},
+  toggleTheme:function(){
+    if(this.theme==='light'){document.documentElement.setAttribute('data-theme','dark');this.theme='dark';document.getElementById('themeIcon').textContent='☀️';}
+    else{document.documentElement.setAttribute('data-theme','light');this.theme='light';document.getElementById('themeIcon').textContent='🌙';}
+  },
+  auth:{
+    login:function(){
+      const id=document.getElementById('loginId').value.trim();
+      if(!id){alert('아이디를 입력하세요');return;}
+      app.user.name=id;
+      document.getElementById('userNameDisplay').textContent=id;
+      app.nav.go('home');
+    },
+    signup:function(){alert('회원가입 완료! 로그인하세요.');app.ui.toggleSignup(false);},
+    logout:function(){app.user={name:'게스트', mood:'', moods:[], foodHistory:[], sleep:[]};app.nav.go('login');}
+  },
+  ui:{toggleSignup:function(show){document.getElementById('signupBox').classList.toggle('hidden',!show);document.getElementById('loginBox').classList.toggle('hidden',show?true:false);}},
+  mood:{
+    record:function(emo){app.user.moods.push({date:new Date(), mood:emo});document.getElementById('homeMoodDisplay').textContent=emo;alert('오늘 기분 기록 완료!');app.nav.go('home');}
+  },
+  food:{
+    list:['🍎 사과','🥗 샐러드','🍔 햄버거','🍣 초밥','🍜 라면','🥦 브로콜리','🍕 피자','🥩 스테이크'],
+    recommend:function(sel){const idx=Math.floor(Math.random()*this.list.length);const el=document.querySelector(sel);el.textContent=this.list[idx];el.classList.add('animating');setTimeout(()=>el.classList.remove('animating'),500);}
+  },
+  sleep:{
+    record:function(){const hrs=parseInt(document.getElementById('sleepInput').value);if(isNaN(hrs)||hrs<0||hrs>24){alert('0~24 사이 입력');return;}app.user.sleep.push(hrs);document.getElementById('sleepMsg').textContent=`오늘 ${hrs}시간 수면 기록 완료!`;document.getElementById('sleepInput').value='';}
+  },
+  quiz:{
+    questions:[
+      {q:"최근 2주간 기분이 우울했나요?",options:["전혀","가끔","자주","항상"]},
+      {q:"잠을 잘 못자거나 많이 잤나요?",options:["전혀","가끔","자주","항상"]},
+      {q:"활동에 흥미가 줄었나요?",options:["전혀","가끔","자주","항상"]}
+    ],
+    render:function(){
+      const container=document.getElementById('quizContainer');container.innerHTML='';
+      this.questions.forEach((x,i)=>{
+        const div=document.createElement('div');div.className='quiz-card';
+        div.innerHTML=`<h3>${x.q}</h3>${x.options.map(o=>`<button class="btn btn-secondary" onclick="app.quiz.answer(${i},'${o}')">${o}</button>`).join('')}`;
+        container.appendChild(div);
       });
-    }
-    
-    // 이벤트 리스너 초기화 (DOM 컨텐츠 로드 후)
-    document.addEventListener("DOMContentLoaded", function() {
-      // 네비게이션 버튼 클릭시 해당 섹션 보여주기.
-      document.querySelectorAll("nav button").forEach(btn => {
-        btn.addEventListener("click", function() {
-          const target = this.getAttribute("data-target");
-          showSection(target);
-        });
-      });
-      
-      // 음식 추천 버튼 클릭 이벤트
-      document.getElementById("recommendFoodBtn").addEventListener("click", getRandomFood);
-      
-      // AI 상담 버튼 클릭 이벤트
-      document.getElementById("getCounselingBtn").addEventListener("click", getRandomAIResponse);
-      
-      // 건강 퀴즈 버튼 클릭 이벤트
-      document.getElementById("newQuestionBtn").addEventListener("click", loadQuizQuestion);
-      document.getElementById("submitAnswerBtn").addEventListener("click", checkQuizAnswer);
-      
-      // 로그인/회원가입 버튼 이벤트
-      document.getElementById("signupBtn").addEventListener("click", signupUser);
-      document.getElementById("loginBtn").addEventListener("click", loginUser);
-      document.getElementById("logoutBtn").addEventListener("click", logoutUser);
-      
-      // 설정 버튼 이벤트
-      document.getElementById("toggleDarkModeBtn").addEventListener("click", toggleDarkMode);
-      document.getElementById("toggleAlarmModeBtn").addEventListener("click", toggleAlarmMode);
-      document.getElementById("resetOutputsBtn").addEventListener("click", resetOutputs);
-      
-      updateUserStatus();
-    });
-  </script>
+    },
+    answers:[],
+    answer:function(idx,opt){this.answers[idx]=opt;if(this.answers.length===this.questions.length){alert('퀴즈 완료! 결과: '+this.answers.join(', '));this.answers=[];app.nav.go('home');}}
+  }
+};
+app.quiz.render();
+</script>
 </body>
 </html>
