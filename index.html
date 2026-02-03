@@ -3,254 +3,215 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>건강·멘탈 관리 풀버전</title>
+<title>건강·멘탈 관리 앱</title>
 <style>
-body{margin:0;font-family:system-ui;background:linear-gradient(135deg,#89f7fe,#66a6ff,#fbc2eb,#a18cd1);color:#333;transition:0.5s;}
-.container{max-width:420px;margin:0 auto;padding:15px;}
-.screen{display:none;}
-.active{display:block;}
-button{width:100%;padding:14px;margin:8px 0;border:none;border-radius:12px;background:#5a7cff;color:white;font-size:16px;cursor:pointer;transition:.2s;}
-button:hover{opacity:.9;}
-h2{margin:0 0 12px;}
-.character{font-size:70px;text-align:center;transition:.3s;}
-.chat-box{height:250px;overflow-y:auto;background:#f3f5fb;border-radius:14px;padding:12px;margin-bottom:10px;}
-.chat-user{text-align:right;margin:6px 0;}
-.chat-ai{text-align:left;margin:6px 0;color:#333;}
-input,select{width:100%;padding:10px;margin-top:5px;border-radius:12px;border:1px solid #ddd;box-sizing:border-box;}
-.small{font-size:13px;color:#666;}
-.backBtn{background:#888;margin-top:10px;}
+body { font-family: system-ui; margin:0; background: linear-gradient(135deg,#a1c4fd,#c2e9fb); color:#333; }
+.container { max-width:420px; margin:0 auto; padding:15px; }
+header { background:#4f46e5; color:white; text-align:center; padding:15px; font-size:18px; border-radius:0 0 15px 15px;}
+.menu { display:flex; justify-content:space-around; margin:10px 0; }
+.menu button { flex:1; margin:0 3px; padding:10px; border:none; border-radius:10px; background:#6b7280; color:white; cursor:pointer;}
+.menu button.active { background:#4f46e5; }
+.screen { display:none; }
+.screen.active { display:block; }
+.card { background:white; border-radius:16px; padding:15px; margin-bottom:15px; box-shadow:0 6px 15px rgba(0,0,0,.08);}
+input, select { width:100%; padding:8px; margin-top:5px; margin-bottom:5px;}
+#chat { height:200px; overflow-y:auto; border:1px solid #ddd; padding:10px; border-radius:10px; background:#f9f9f9; }
+.msg { margin-bottom:10px; }
+.user { font-weight:bold; color:#4f46e5; }
+.ai { font-weight:bold; color:#16a34a; }
 </style>
 </head>
 <body>
+<header>건강·멘탈 관리 앱</header>
+
 <div class="container">
+  <div class="menu">
+    <button onclick="showScreen('login')" id="btnLogin">로그인</button>
+    <button onclick="showScreen('mental')" id="btnMental">멘탈</button>
+    <button onclick="showScreen('food')" id="btnFood">음식</button>
+    <button onclick="showScreen('game')" id="btnGame">미니게임</button>
+    <button onclick="showScreen('chat')" id="btnChat">AI 상담</button>
+    <button onclick="logout()">로그아웃</button>
+  </div>
 
-<!-- 로그인 -->
-<div id="loginScreen" class="screen active">
-<h2>🔑 로그인 / 회원가입</h2>
-<input type="text" id="username" placeholder="이름">
-<input type="number" id="age" placeholder="나이">
-<input type="password" id="password" placeholder="비밀번호">
-<button onclick="registerUser()">회원가입</button>
-<button onclick="loginUser()">로그인</button>
-<p class="small" id="loginMsg"></p>
-</div>
+  <!-- 로그인/회원가입 -->
+  <div class="screen" id="login">
+    <div class="card">
+      <h2>로그인 / 회원가입</h2>
+      <input type="text" id="username" placeholder="이름">
+      <input type="number" id="age" placeholder="나이">
+      <input type="password" id="password" placeholder="비밀번호">
+      <button onclick="signup()">회원가입</button>
+      <button onclick="login()">로그인</button>
+      <p id="loginMsg"></p>
+    </div>
+  </div>
 
-<!-- 홈 -->
-<div id="home" class="screen">
-<h2>🏠 건강관리 홈</h2>
-<button onclick="showScreen('mental')">🧠 멘탈 관리</button>
-<button onclick="showScreen('sleep')">🌙 수면 기록</button>
-<button onclick="showScreen('food')">🥗 음식 추천</button>
-<button onclick="showScreen('game')">🎮 미니게임</button>
-<button onclick="showScreen('chat')">🗨️ AI 상담</button>
-<p class="small" id="welcomeMsg"></p>
-<button class="backBtn" onclick="logoutUser()">🚪 로그아웃</button>
-</div>
+  <!-- 멘탈 관리 -->
+  <div class="screen" id="mental">
+    <div class="card">
+      <h2>🧍 멘탈 상태</h2>
+      <button onclick="setMood('😄')">좋음</button>
+      <button onclick="setMood('😐')">보통</button>
+      <button onclick="setMood('😢')">나쁨</button>
+      <p id="moodComment"></p>
+    </div>
+    <div class="card">
+      <h2>🌙 수면 시간</h2>
+      <select id="sleepPeriod"><option>오전</option><option>오후</option></select>
+      <input type="number" id="sleep" placeholder="시간 입력">
+      <button onclick="saveSleep()">저장</button>
+      <p id="sleepLog"></p>
+    </div>
+  </div>
 
-<!-- 멘탈 -->
-<div id="mental" class="screen">
-<h2>🧍 내 캐릭터</h2>
-<div class="character" id="char">😐</div>
-<p class="small" id="charState"></p>
-<h2>오늘 멘탈 선택</h2>
-<button onclick="setMood('😄')">좋음</button>
-<button onclick="setMood('😐')">보통</button>
-<button onclick="setMood('😢')">나쁨</button>
-<button onclick="setMood('🥱')">졸림</button>
-<button onclick="setMood('😎')">신남</button>
-<button class="backBtn" onclick="showScreen('home')">⬅️ 홈으로</button>
-</div>
+  <!-- 음식 추천 -->
+  <div class="screen" id="food">
+    <div class="card">
+      <h2>🥗 오늘의 추천 음식</h2>
+      <p id="foodDisplay"></p>
+      <button onclick="pickFood()">새로 추천</button>
+    </div>
+  </div>
 
-<!-- 수면 -->
-<div id="sleep" class="screen">
-<h2>🌙 수면 기록</h2>
-<label>자는 시간</label>
-<input type="number" id="sleepStartHour" placeholder="시간 (0~12)">
-<select id="sleepStartAMPM"><option>오전</option><option>오후</option></select>
-<label>일어나는 시간</label>
-<input type="number" id="sleepEndHour" placeholder="시간 (0~12)">
-<select id="sleepEndAMPM"><option>오전</option><option>오후</option></select>
-<button onclick="saveSleep()">저장</button>
-<p class="small" id="sleepMsg"></p>
-<button class="backBtn" onclick="showScreen('home')">⬅️ 홈으로</button>
-</div>
+  <!-- 미니게임 -->
+  <div class="screen" id="game">
+    <div class="card">
+      <h2>🎮 미니게임</h2>
+      <p id="gameQ"></p>
+      <input type="text" id="gameAns" placeholder="정답 입력">
+      <button onclick="submitGame()">제출</button>
+      <p id="gameResult"></p>
+      <button onclick="newGame()">다음 문제</button>
+    </div>
+  </div>
 
-<!-- 음식 -->
-<div id="food" class="screen">
-<h2>🥗 오늘의 추천 음식</h2>
-<select id="foodCategory">
-<option value="all">전체</option>
-<option value="protein">단백질</option>
-<option value="fruit">과일</option>
-<option value="veg">채소</option>
-<option value="snack">간식</option>
-<option value="supplement">건강식품</option>
-<option value="nuts">견과류</option>
-</select>
-<p id="foodText"></p>
-<button onclick="recommendFood()">다시 추천</button>
-<button class="backBtn" onclick="showScreen('home')">⬅️ 홈으로</button>
-</div>
-
-<!-- 미니게임 -->
-<div id="game" class="screen">
-<h2>🎮 미니게임</h2>
-<p id="gameQ"></p>
-<input type="text" id="gameAns" placeholder="정답 입력">
-<button onclick="checkGame()">제출</button>
-<p class="small" id="gameMsg"></p>
-<button onclick="nextGame()">다음 문제</button>
-<button class="backBtn" onclick="showScreen('home')">⬅️ 홈으로</button>
-</div>
-
-<!-- AI 상담 -->
-<div id="chat" class="screen">
-<h2>🗨️ AI 상담</h2>
-<div class="chat-box" id="chatBox"></div>
-<input type="text" id="userChat" placeholder="말을 입력하고 엔터" onkeydown="if(event.key==='Enter') sendChat()">
-<button class="backBtn" onclick="showScreen('home')">⬅️ 홈으로</button>
-</div>
+  <!-- AI 상담 -->
+  <div class="screen" id="chat">
+    <div class="card">
+      <h2>💬 AI 상담</h2>
+      <div id="chatBox"></div>
+      <input type="text" id="userInput" placeholder="메시지 입력">
+      <button onclick="sendMessage()">전송</button>
+    </div>
+  </div>
 
 </div>
-
-<script src="foods.json"></script>
-<script src="aiKeywords.json"></script>
-<script src="games.json"></script>
 
 <script>
-// ---------------- SPA 화면 ----------------
+let foods=[], aiData=[], games=[];
+let currentGame={};
+let currentUser=null;
+
+// 화면 전환
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-// ---------------- 회원가입/로그인 ----------------
-let users=JSON.parse(localStorage.getItem("users")||"{}");
-let currentUser=null;
-let userData={mood:"😐",sleep:"",chat:[],foodHistory:[]};
-
-function registerUser(){
-  const name=document.getElementById("username").value.trim();
-  const age=parseInt(document.getElementById("age").value);
-  const pw=document.getElementById("password").value;
-  if(!name||isNaN(age)||!pw){document.getElementById("loginMsg").textContent="모든 정보를 입력!";return;}
-  if(users[name]){document.getElementById("loginMsg").textContent="이미 존재";}
-  else{
-    users[name]={age:age,password:pw,mood:"😐",chat:[],sleep:"",foodHistory:[]};
-    localStorage.setItem("users",JSON.stringify(users));
-    document.getElementById("loginMsg").textContent="가입 완료!";
-  }
+// 회원가입
+function signup(){
+  let name=document.getElementById("username").value;
+  let age=document.getElementById("age").value;
+  let pw=document.getElementById("password").value;
+  if(!name||!age||!pw){ document.getElementById("loginMsg").textContent="모든 항목 입력!"; return; }
+  let users=JSON.parse(localStorage.getItem("users")||"{}");
+  if(users[name]){ document.getElementById("loginMsg").textContent="이미 있는 이름"; return; }
+  users[name]={age:age,password:pw};
+  localStorage.setItem("users",JSON.stringify(users));
+  document.getElementById("loginMsg").textContent="회원가입 완료!";
 }
 
-function loginUser(){
-  const name=document.getElementById("username").value.trim();
-  const pw=document.getElementById("password").value;
+// 로그인
+function login(){
+  let name=document.getElementById("username").value;
+  let pw=document.getElementById("password").value;
+  let users=JSON.parse(localStorage.getItem("users")||"{}");
   if(users[name]&&users[name].password===pw){
-    currentUser=name;
-    userData=users[currentUser];
-    char.textContent=userData.mood||"😐";
-    charState.textContent="";
-    document.getElementById("welcomeMsg").textContent=`환영합니다, ${currentUser}님 (나이:${users[currentUser].age})`;
-    showScreen('home');
-  }else{
-    document.getElementById("loginMsg").textContent="로그인 실패!";
-  }
+    currentUser={name:name,age:users[name].age};
+    document.getElementById("loginMsg").textContent=`환영합니다, ${name}님!`;
+    showScreen("mental");
+  } else { document.getElementById("loginMsg").textContent="로그인 실패"; }
 }
 
-function logoutUser(){
+// 로그아웃
+function logout(){
   currentUser=null;
-  userData={mood:"😐",sleep:"",chat:[],foodHistory:[]};
-  showScreen('loginScreen');
+  showScreen("login");
 }
 
-// ---------------- 멘탈 ----------------
-const char=document.getElementById("char");
-const charState=document.getElementById("charState");
+// 멘탈
+let moodComments={"😄":["좋아요! 계속 이렇게 행복하게 지내요 😄"],"😐":["보통이네요. 산책 어때요?"],"😢":["괜찮아요. 스트레칭 추천!"]};
 function setMood(m){
-  char.textContent=m;
-  const msgs={"😄":["좋아요! 오늘 활기차네요!"],"😐":["괜찮아요. 천천히 힐링해요."],"😢":["힘들 수 있어요. 잠깐 쉬세요."],"🥱":["졸리군요. 커피나 스트레칭!"],"😎":["멋져요! 활기찬 하루!"]};
-  charState.textContent=msgs[m][Math.floor(Math.random()*msgs[m].length)];
-  if(currentUser){
-    userData.mood=m;
-    users[currentUser]=userData;
-    localStorage.setItem("users",JSON.stringify(users));
-  }
+  document.getElementById("moodComment").textContent=moodComments[m][Math.floor(Math.random()*moodComments[m].length)];
+  localStorage.setItem("mood",m);
 }
-
-// ---------------- 수면 ----------------
 function saveSleep(){
-  const startH=parseInt(document.getElementById("sleepStartHour").value);
-  const startM=document.getElementById("sleepStartAMPM").value;
-  const endH=parseInt(document.getElementById("sleepEndHour").value);
-  const endM=document.getElementById("sleepEndAMPM").value;
-  if(isNaN(startH)||isNaN(endH)){document.getElementById("sleepMsg").textContent="시간 입력 필요";return;}
-  const start=(startM==="오후"?startH+12:startH);
-  const end=(endM==="오후"?endH+12:endH);
-  const hours=end-start<0?24+(end-start):end-start;
-  userData.sleep=hours+"시간";
-  document.getElementById("sleepMsg").textContent="수면 기록됨: "+userData.sleep;
-  if(currentUser){
-    users[currentUser]=userData;
-    localStorage.setItem("users",JSON.stringify(users));
-  }
+  let s=document.getElementById("sleep").value;
+  let p=document.getElementById("sleepPeriod").value;
+  if(!currentUser){ alert("로그인 필요"); return; }
+  let data=JSON.parse(localStorage.getItem("userData")||"{}");
+  data[currentUser.name]={sleep:`${p} ${s}시간`};
+  localStorage.setItem("userData",JSON.stringify(data));
+  document.getElementById("sleepLog").textContent=`${p} ${s}시간 저장됨`;
 }
 
-// ---------------- 음식 ----------------
-function recommendFood(){
-  const cat=document.getElementById("foodCategory").value;
-  let list=foods;
-  if(cat!=="all"){list=list.filter(f=>f.cat===cat);}
-  if(list.length===0){document.getElementById("foodText").textContent="추천 없음";return;}
-  const pick=list[Math.floor(Math.random()*list.length)];
-  document.getElementById("foodText").textContent=pick.name;
-  if(currentUser){
-    userData.foodHistory.push(pick.name);
-    users[currentUser]=userData;
-    localStorage.setItem("users",JSON.stringify(users));
-  }
+// JSON 로딩
+async function loadJSON(){
+  foods=await fetch("foods.json").then(r=>r.json());
+  aiData=await fetch("aiKeywords.json").then(r=>r.json());
+  games=await fetch("games.json").then(r=>r.json());
+  pickFood();
+  newGame();
+}
+loadJSON();
+
+// 음식 추천
+function pickFood(){
+  if(foods.length===0) return;
+  let f=foods[Math.floor(Math.random()*foods.length)];
+  document.getElementById("foodDisplay").textContent=`${f.cat}: ${f.name}`;
 }
 
-// ---------------- 미니게임 ----------------
-let currentGame=0;
-function loadGame(){nextGame();}
-function nextGame(){
-  currentGame=Math.floor(Math.random()*games.length);
-  const g=games[currentGame];
-  document.getElementById("gameQ").textContent=g.q;
+// 미니게임
+function newGame(){
+  if(games.length===0) return;
+  currentGame=games[Math.floor(Math.random()*games.length)];
+  document.getElementById("gameQ").textContent=currentGame.q;
   document.getElementById("gameAns").value="";
-  document.getElementById("gameMsg").textContent="";
+  document.getElementById("gameResult").textContent="";
 }
-function checkGame(){
-  const ans=document.getElementById("gameAns").value.trim().toLowerCase();
-  const correct=games[currentGame].a.toLowerCase();
-  if(ans===correct){document.getElementById("gameMsg").textContent="✅ 정답!";}
-  else{document.getElementById("gameMsg").textContent="❌ 오답! 정답: "+games[currentGame].a;}
-}
-
-// ---------------- AI 상담 ----------------
-function sendChat(){
-  const msg=document.getElementById("userChat").value.trim();
-  if(!msg)return;
-  const box=document.getElementById("chatBox");
-  box.innerHTML+=`<div class="chat-user">${msg}</div>`;
-  document.getElementById("userChat").value="";
-  let response="죄송, 이해하지 못했어요.";
-  for(const k of aiKeywords){
-    if(k.k.some(w=>msg.includes(w))){response=k.r[Math.floor(Math.random()*k.r.length)];break;}
-  }
-  box.innerHTML+=`<div class="chat-ai">${response}</div>`;
-  box.scrollTop=box.scrollHeight;
-  if(currentUser){
-    userData.chat.push({user:msg,ai:response});
-    users[currentUser]=userData;
-    localStorage.setItem("users",JSON.stringify(users));
-  }
+function submitGame(){
+  let ans=document.getElementById("gameAns").value.trim();
+  if(ans===currentGame.a){ document.getElementById("gameResult").textContent="✅ 정답!"; }
+  else { document.getElementById("gameResult").textContent=`❌ 오답! 정답: ${currentGame.a}`; }
 }
 
-// ---------------- 초기화 ----------------
-window.onload=()=>{
-  loadGame();
-};
+// AI 상담
+function sendMessage(){
+  let input=document.getElementById("userInput").value.trim();
+  if(!input) return;
+  addChat("user", input);
+  document.getElementById("userInput").value="";
+  let response="죄송해요, 이해 못했어요";
+  for(let item of aiData){
+    for(let k of item.k){
+      if(input.includes(k)){
+        response=item.r[Math.floor(Math.random()*item.r.length)];
+        break;
+      }
+    }
+  }
+  addChat("ai", response);
+}
+function addChat(type,text){
+  let chat=document.getElementById("chatBox");
+  let div=document.createElement("div");
+  div.className="msg "+type;
+  div.textContent=text;
+  chat.appendChild(div);
+  chat.scrollTop=chat.scrollHeight;
+}
 </script>
 </body>
 </html>
