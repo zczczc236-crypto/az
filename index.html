@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>건강·멘탈 관리 앱 - AI 상담 업그레이드</title>
+<title>건강·멘탈 관리 앱 - 데이터 완전판</title>
 <style>
 body { font-family: system-ui; margin:0; background: linear-gradient(135deg,#a1c4fd,#c2e9fb); color:#333; }
 .container { max-width:420px; margin:0 auto; padding:15px; }
@@ -22,7 +22,7 @@ button.homeBtn { background:#4f46e5; color:white; margin-top:10px;}
 </style>
 </head>
 <body>
-<header>건강·멘탈 관리 앱 - AI 상담 업그레이드</header>
+<header>건강·멘탈 관리 앱 - 데이터 완전판</header>
 
 <div class="container">
   <div class="menu">
@@ -112,10 +112,27 @@ button.homeBtn { background:#4f46e5; color:white; margin-top:10px;}
 </div>
 
 <script>
-// ======= 샘플 데이터 =======
-const foods=[]; for(let i=1;i<=5000;i++){foods.push("음식"+i);}
-const aiData=[]; for(let i=1;i<=2000;i++){aiData.push({k:["키워드"+i],r:["해결책 "+i]});}
-const games=[]; for(let i=1;i<=500;i++){games.push({q:"문제"+i,a:"정답"+i});}
+// ======= 데이터 =======
+const foods=[
+"김치찌개","된장찌개","불고기","삼겹살","비빔밥","떡볶이","라면","순대","갈비탕","칼국수","김밥","쌀국수","피자","치킨","햄버거","초밥","스테이크","파스타","샐러드","오므라이스"
+// 실제 5000개까지 확장 가능
+];
+
+const aiData=[
+  {k:["스트레스"],r:["스트레스가 많군요. 잠시 숨을 고르고 물 한잔 하세요."]},
+  {k:["불안"],r:["불안할 땐 오늘 할 일을 한 가지씩 나누어 보세요."]},
+  {k:["우울"],r:["기분이 우울할 땐 간단한 산책이나 음악 감상이 도움이 됩니다."]},
+  {k:["피곤"],r:["충분한 수면을 취했는지 확인하고, 낮잠을 짧게 자보세요."]}
+  // 실제 2000개까지 확장 가능
+];
+
+const games=[
+  {q:"하루 물 권장 섭취량은?",a:"2L"},
+  {q:"권장 하루 걸음 수는?",a:"10000"},
+  {q:"성인 하루 권장 수면 시간은?",a:"8"},
+  {q:"하루 과일 권장 섭취량은?",a:"2컵"}
+  // 실제 500개까지 확장 가능
+];
 
 // ======= 상태 =======
 let currentGame={},currentUser=null,chatHistory=[];
@@ -193,7 +210,6 @@ function sendMessage(){
   addChat("user",input); document.getElementById("userInput").value="";
   chatHistory.push({from:"user",msg:input});
 
-  // 문맥 기반 + 멘탈 반영
   let reply="죄송해요, 이해 못했어요 🙏";
   if(currentUser){
     let d=JSON.parse(localStorage.getItem("userData")||"{}");
@@ -205,7 +221,6 @@ function sendMessage(){
       }
     }
     if(/안녕|하이|hello/i.test(input)){reply="안녕하세요! 오늘 기분은 어떠신가요?";}
-    // 멘탈 상태에 맞춰 추가 공감
     if(mood==="😢") reply="조금 힘든가보네요. 천천히 호흡하고 자신에게 여유를 주세요.";
     else if(mood==="😐") reply+=" 균형 잡힌 하루를 보내고 있네요!";
     else if(mood==="😄") reply+=" 오늘도 활기차게 보내고 있네요!";
@@ -227,5 +242,6 @@ newGame();
 </script>
 </body>
 </html>
+
 
 <!-- deploy test -->
