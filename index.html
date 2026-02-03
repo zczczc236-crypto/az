@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>건강·멘탈 관리 앱</title>
+<title>건강·멘탈 관리 앱 - 완전체</title>
 <style>
 body { font-family: system-ui; margin:0; background: linear-gradient(135deg,#a1c4fd,#c2e9fb); color:#333; }
 .container { max-width:420px; margin:0 auto; padding:15px; }
 header { background:#4f46e5; color:white; text-align:center; padding:15px; font-size:18px; border-radius:0 0 15px 15px;}
-.menu { display:flex; justify-content:space-around; margin:10px 0; }
-.menu button { flex:1; margin:0 3px; padding:10px; border:none; border-radius:10px; background:#6b7280; color:white; cursor:pointer;}
+.menu { display:flex; justify-content:space-around; margin:10px 0; flex-wrap:wrap; }
+.menu button { flex:1; margin:3px; padding:10px; border:none; border-radius:10px; background:#6b7280; color:white; cursor:pointer;}
 .menu button.active { background:#4f46e5; }
 .screen { display:none; }
 .screen.active { display:block; }
 .card { background:white; border-radius:16px; padding:15px; margin-bottom:15px; box-shadow:0 6px 15px rgba(0,0,0,.08);}
 input, select { width:100%; padding:8px; margin-top:5px; margin-bottom:5px;}
-#chat { height:200px; overflow-y:auto; border:1px solid #ddd; padding:10px; border-radius:10px; background:#f9f9f9; }
+#chatBox { height:250px; overflow-y:auto; border:1px solid #ddd; padding:10px; border-radius:10px; background:#f9f9f9; }
 .msg { margin-bottom:10px; }
 .user { font-weight:bold; color:#4f46e5; }
 .ai { font-weight:bold; color:#16a34a; }
@@ -26,15 +26,14 @@ input, select { width:100%; padding:8px; margin-top:5px; margin-bottom:5px;}
 
 <div class="container">
   <div class="menu">
-    <button onclick="showScreen('login')" id="btnLogin">로그인</button>
-    <button onclick="showScreen('mental')" id="btnMental">멘탈</button>
-    <button onclick="showScreen('food')" id="btnFood">음식</button>
-    <button onclick="showScreen('game')" id="btnGame">미니게임</button>
-    <button onclick="showScreen('chat')" id="btnChat">AI 상담</button>
+    <button onclick="showScreen('login')">로그인</button>
+    <button onclick="showScreen('mental')">멘탈</button>
+    <button onclick="showScreen('food')">음식</button>
+    <button onclick="showScreen('game')">미니게임</button>
+    <button onclick="showScreen('chat')">AI 상담</button>
     <button onclick="logout()">로그아웃</button>
   </div>
 
-  <!-- 로그인/회원가입 -->
   <div class="screen" id="login">
     <div class="card">
       <h2>로그인 / 회원가입</h2>
@@ -47,7 +46,6 @@ input, select { width:100%; padding:8px; margin-top:5px; margin-bottom:5px;}
     </div>
   </div>
 
-  <!-- 멘탈 관리 -->
   <div class="screen" id="mental">
     <div class="card">
       <h2>🧍 멘탈 상태</h2>
@@ -65,7 +63,6 @@ input, select { width:100%; padding:8px; margin-top:5px; margin-bottom:5px;}
     </div>
   </div>
 
-  <!-- 음식 추천 -->
   <div class="screen" id="food">
     <div class="card">
       <h2>🥗 오늘의 추천 음식</h2>
@@ -74,7 +71,6 @@ input, select { width:100%; padding:8px; margin-top:5px; margin-bottom:5px;}
     </div>
   </div>
 
-  <!-- 미니게임 -->
   <div class="screen" id="game">
     <div class="card">
       <h2>🎮 미니게임</h2>
@@ -86,7 +82,6 @@ input, select { width:100%; padding:8px; margin-top:5px; margin-bottom:5px;}
     </div>
   </div>
 
-  <!-- AI 상담 -->
   <div class="screen" id="chat">
     <div class="card">
       <h2>💬 AI 상담</h2>
@@ -99,17 +94,26 @@ input, select { width:100%; padding:8px; margin-top:5px; margin-bottom:5px;}
 </div>
 
 <script>
-let foods=[], aiData=[], games=[];
+// ================= 데이터 샘플 =================
+let foods = [];
+for(let i=1;i<=5000;i++) foods.push({cat:"건강식품", name:"음식"+i});
+let aiData = [];
+for(let i=1;i<=2000;i++) aiData.push({k:["키워드"+i], r:["추천 방법"+i,"해결 방법"+i]});
+let games = [];
+for(let i=1;i<=500;i++) games.push({q:"문제 "+i+" 질문?", a:"답"+i});
+
+// ================= 변수 =================
 let currentGame={};
 let currentUser=null;
+let moodComments={"😄":["좋아요! 계속 행복하게 지내요 😄"],"😐":["보통이네요. 잠깐 산책 어때요?"],"😢":["괜찮아요. 가벼운 스트레칭 추천!"]};
 
-// 화면 전환
+// ================= 화면 전환 =================
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-// 회원가입
+// ================= 회원 =================
 function signup(){
   let name=document.getElementById("username").value;
   let age=document.getElementById("age").value;
@@ -122,7 +126,6 @@ function signup(){
   document.getElementById("loginMsg").textContent="회원가입 완료!";
 }
 
-// 로그인
 function login(){
   let name=document.getElementById("username").value;
   let pw=document.getElementById("password").value;
@@ -134,18 +137,15 @@ function login(){
   } else { document.getElementById("loginMsg").textContent="로그인 실패"; }
 }
 
-// 로그아웃
-function logout(){
-  currentUser=null;
-  showScreen("login");
-}
+function logout(){ currentUser=null; showScreen("login"); }
 
-// 멘탈
-let moodComments={"😄":["좋아요! 계속 이렇게 행복하게 지내요 😄"],"😐":["보통이네요. 산책 어때요?"],"😢":["괜찮아요. 스트레칭 추천!"]};
+// ================= 멘탈 =================
 function setMood(m){
   document.getElementById("moodComment").textContent=moodComments[m][Math.floor(Math.random()*moodComments[m].length)];
   localStorage.setItem("mood",m);
 }
+
+// ================= 수면 =================
 function saveSleep(){
   let s=document.getElementById("sleep").value;
   let p=document.getElementById("sleepPeriod").value;
@@ -156,24 +156,14 @@ function saveSleep(){
   document.getElementById("sleepLog").textContent=`${p} ${s}시간 저장됨`;
 }
 
-// JSON 로딩
-async function loadJSON(){
-  foods=await fetch("foods.json").then(r=>r.json());
-  aiData=await fetch("aiKeywords.json").then(r=>r.json());
-  games=await fetch("games.json").then(r=>r.json());
-  pickFood();
-  newGame();
-}
-loadJSON();
-
-// 음식 추천
+// ================= 음식 =================
 function pickFood(){
   if(foods.length===0) return;
   let f=foods[Math.floor(Math.random()*foods.length)];
   document.getElementById("foodDisplay").textContent=`${f.cat}: ${f.name}`;
 }
 
-// 미니게임
+// ================= 미니게임 =================
 function newGame(){
   if(games.length===0) return;
   currentGame=games[Math.floor(Math.random()*games.length)];
@@ -181,13 +171,14 @@ function newGame(){
   document.getElementById("gameAns").value="";
   document.getElementById("gameResult").textContent="";
 }
+
 function submitGame(){
   let ans=document.getElementById("gameAns").value.trim();
   if(ans===currentGame.a){ document.getElementById("gameResult").textContent="✅ 정답!"; }
   else { document.getElementById("gameResult").textContent=`❌ 오답! 정답: ${currentGame.a}`; }
 }
 
-// AI 상담
+// ================= AI 상담 =================
 function sendMessage(){
   let input=document.getElementById("userInput").value.trim();
   if(!input) return;
@@ -204,6 +195,7 @@ function sendMessage(){
   }
   addChat("ai", response);
 }
+
 function addChat(type,text){
   let chat=document.getElementById("chatBox");
   let div=document.createElement("div");
@@ -212,6 +204,9 @@ function addChat(type,text){
   chat.appendChild(div);
   chat.scrollTop=chat.scrollHeight;
 }
+
+// 초기 화면
+showScreen("login");
 </script>
 </body>
 </html>
