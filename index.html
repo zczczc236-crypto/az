@@ -1,273 +1,310 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>무료 웹 앱: 음식 추천, AI 상담, 건강 퀴즈</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>무료 웹 앱 - 음식 추천, AI 상담, 건강 퀴즈</title>
   <style>
-    /* 전역 스타일 및 폰트 설정 */
-    body {
-      font-family: '맑은 고딕', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-      color: #333;
-      transition: background-color 0.3s, color 0.3s;
-    }
-    /* 다크모드 스타일 */
-    body.dark {
-      background-color: #333;
-      color: #f4f4f4;
-    }
-    header {
-      background-color: #008080;
-      color: #fff;
-      padding: 20px;
-      text-align: center;
-    }
-    .container {
-      max-width: 900px;
-      margin: 20px auto;
-      padding: 10px;
-    }
-    /* 버튼 스타일 */
-    button, input[type="button"] {
-      padding: 10px 15px;
-      margin: 5px;
-      border: none;
-      background-color: #008080;
-      color: #fff;
-      cursor: pointer;
-      border-radius: 4px;
-      transition: background-color 0.3s;
-    }
-    button:hover, input[type="button"]:hover {
-      background-color: #006666;
-    }
-    /* 폼 요소 스타일 */
-    select, input[type="text"] {
+    /* 기본 스타일 및 모바일 대응 CSS */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; color: #333; transition: background 0.3s, color 0.3s; }
+    .dark { background: #333; color: #f5f5f5; }
+    header { background: #4CAF50; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; color: white; }
+    header h1 { font-size: 1.5em; }
+    nav button { margin: 0 5px; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; background: #66BB6A; color: white; }
+    nav button:hover { background: #81C784; }
+    .section { display: none; padding: 20px; }
+    .active { display: block; }
+    /* 폼, 버튼 및 입력 필드 스타일 */
+    input[type="text"], input[type="password"] {
       padding: 8px;
-      margin: 5px;
+      margin: 5px 0;
+      width: 90%;
       border: 1px solid #ccc;
       border-radius: 4px;
-      width: 80%;
-      max-width: 300px;
     }
-    /* 섹션 구분 */
-    section {
-      border: 1px solid #ddd;
-      background-color: #fff;
-      padding: 15px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    /* 다크모드 섹션 배경 */
-    body.dark section {
-      background-color: #555;
-      border-color: #666;
-    }
-    /* 반응형 디자인 */
+    button { padding: 10px 15px; margin: 5px 0; border: none; border-radius: 4px; cursor: pointer; background: #4CAF50; color: white; }
+    button:hover { background: #45A049; }
+    .output { margin-top: 10px; padding: 10px; background: #eee; border-radius: 4px; min-height: 30px; }
+    /* 로그인/회원가입 모달 및 영역 */
+    #loginSection { max-width: 400px; margin: 20px auto; padding: 20px; background: white; border: 1px solid #ccc; border-radius: 4px; }
+    /* Settings 영역 */
+    #settingsSection button { background: #FF9800; }
+    /* 모바일 대응 미디어 쿼리 */
     @media (max-width: 600px) {
-      body {
-        font-size: 0.9em;
-      }
-      button, select, input[type="text"] {
-        width: 90%;
-      }
+      header { flex-direction: column; }
+      nav button { margin: 5px 0; }
     }
-    /* 추가 UI 요소: 토글박스 스타일 */
-    .toggle-container {
-      margin: 10px 0;
+    /* alarm mode: 간단한 깜빡임 효과 */
+    .alarm {
+      animation: blink 1s step-start infinite;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
     }
   </style>
 </head>
 <body>
+  <!-- 헤더 및 네비게이션 -->
   <header>
-    <h1>무료 웹 앱: 음식 추천, AI 감정 상담, 건강 퀴즈</h1>
+    <h1>무료 웹 앱</h1>
+    <nav>
+      <button data-target="loginSection">로그인/회원가입</button>
+      <button data-target="foodSection">음식 추천</button>
+      <button data-target="aiSection">AI 상담</button>
+      <button data-target="quizSection">건강 퀴즈</button>
+      <button data-target="settingsSection">설정</button>
+    </nav>
   </header>
   
-  <div class="container">
-    <!-- 다크모드 및 알람 모드 토글 -->
-    <div class="toggle-container">
-      <label>
-        <input type="checkbox" id="darkModeToggle"> 다크 모드
-      </label>
-      <label style="margin-left:15px;">
-        <input type="checkbox" id="alarmModeToggle"> 알람 모드
-      </label>
+  <!-- 로그인/회원가입 섹션 -->
+  <section id="loginSection" class="section active">
+    <h2>로그인 / 회원가입</h2>
+    <div id="userStatus">
+      <!-- 로그인 상태를 보여줌 -->
+      <p>현재 로그인 상태: <span id="statusText">로그인되지 않음</span></p>
     </div>
-    
-    <!-- 음식 추천 섹션 -->
-    <section id="foodSection">
-      <h2>랜덤 음식 추천</h2>
-      <button id="randomFoodBtn">음식 추천 받기</button>
-      <button id="resetFoodBtn">결과 초기화</button>
-      <div id="foodOutput" style="margin-top:10px; font-weight:bold;"></div>
-    </section>
-    
-    <!-- AI 감정 상담 섹션 -->
-    <section id="aiSection">
-      <h2>AI 감정 상담</h2>
-      <select id="emotionSelect">
-        <option value="" disabled selected>감정을 선택하세요</option>
-        <option value="행복">행복</option>
-        <option value="슬픔">슬픔</option>
-        <option value="분노">분노</option>
-      </select>
-      <button id="aiCounselBtn">상담 받기</button>
-      <button id="resetAiBtn">결과 초기화</button>
-      <div id="aiOutput" style="margin-top:10px; font-weight:bold;"></div>
-    </section>
-    
-    <!-- 건강 퀴즈 섹션 -->
-    <section id="quizSection">
-      <h2>건강 상식 퀴즈</h2>
-      <button id="loadQuizBtn">문제 불러오기</button>
-      <button id="resetQuizBtn">퀴즈 초기화</button>
-      <div id="quizDisplay" style="margin-top:10px; font-weight:bold;"></div>
-      <input type="text" id="answerInput" placeholder="정답을 입력하세요">
-      <button id="checkAnswerBtn">정답 확인</button>
-      <button id="resetAnswerBtn">입력 초기화</button>
-      <div id="resultOutput" style="margin-top:10px; font-weight:bold;"></div>
-    </section>
-  </div>
+    <form id="authForm">
+      <input type="text" id="username" placeholder="아이디 입력" required>
+      <input type="password" id="password" placeholder="비밀번호 입력" required>
+      <div>
+        <button type="button" id="loginBtn">로그인</button>
+        <button type="button" id="signupBtn">회원가입</button>
+        <button type="button" id="logoutBtn" style="display:none; background: #f44336;">로그아웃</button>
+      </div>
+    </form>
+    <div id="authMessage" class="output"></div>
+  </section>
   
+  <!-- 음식 추천 섹션 -->
+  <section id="foodSection" class="section">
+    <h2>랜덤 음식 추천</h2>
+    <button id="recommendFoodBtn">음식 추천 받기</button>
+    <div id="foodOutput" class="output"></div>
+  </section>
+  
+  <!-- AI 감정 상담 섹션 -->
+  <section id="aiSection" class="section">
+    <h2>AI 감정 상담</h2>
+    <select id="emotionSelect">
+      <option value="happy">행복해요</option>
+      <option value="sad">슬퍼요</option>
+      <option value="anxious">불안해요</option>
+    </select>
+    <button id="getCounselingBtn">상담 메시지 확인</button>
+    <div id="aiOutput" class="output"></div>
+  </section>
+  
+  <!-- 건강 퀴즈 섹션 -->
+  <section id="quizSection" class="section">
+    <h2>건강 상식 퀴즈</h2>
+    <button id="newQuestionBtn">새 문제 받기</button>
+    <div id="quizQuestion" class="output" style="min-height:50px;"></div>
+    <input type="text" id="quizAnswer" placeholder="답을 입력하세요">
+    <button id="submitAnswerBtn">정답 제출</button>
+    <div id="resultOutput" class="output"></div>
+  </section>
+  
+  <!-- 설정 및 추가 기능 섹션 -->
+  <section id="settingsSection" class="section">
+    <h2>설정</h2>
+    <button id="toggleDarkModeBtn">다크 모드 전환</button>
+    <button id="toggleAlarmModeBtn">알람 모드 전환</button>
+    <button id="resetOutputsBtn">출력 초기화</button>
+  </section>
+  
+  <!-- JavaScript: 기능 및 데이터 로직 -->
   <script>
-    // ========================= DATA 초기화 =========================
-    
-    // 음식 데이터 (한국식 데이터 위주)
-    const foods = ["불고기", "비빔밥", "김치찌개", "삼겹살", "떡볶이"];
-    
-    // 감정별 AI 상담 문구
+    // 데이터 배열들 및 객체 설정
+    // 음식 데이터 배열 (한국식 음식 중심)
+    const foods = ["비빔밥", "김치찌개", "떡볶이", "불고기", "된장찌개", "칼국수", "삼계탕", "냉면"];
+
+    // 감정별 AI 상담 메시지
     const aiResponses = {
-      "행복": ["오늘 정말 좋은 일이 있었네요!", "행복한 미소를 유지하세요.", "세상은 당신의 웃음으로 빛납니다."],
-      "슬픔": ["슬픔을 이겨내고 더 강해지세요.", "어려운 시기도 지나갑니다.", "당신은 소중한 사람이에요."],
-      "분노": ["조금 진정해보세요. 마음을 다스리는 것이 중요합니다.", "차분해지면 해결책이 보일 거예요.", "잠깐 휴식을 취해보세요."]
+      happy: ["행복은 나누면 두 배가 됩니다!", "당신의 미소는 주변을 환하게 만듭니다."],
+      sad: ["힘든 날도 있지만 내일은 더 나아질 거예요.", "슬픔을 이겨내면 더 강해질 수 있습니다."],
+      anxious: ["불안은 잠시 뿐, 지금 이 순간에 집중하세요.", "마음을 가라앉히고 심호흡 해보세요."]
     };
-    
-    // 건강 퀴즈 데이터 (문제와 정답)
+
+    // 건강 상식 퀴즈 데이터 배열
     const quizQuestions = [
-      { question: "하루에 물은 몇 리터 마시는 것이 좋을까요?", answer: "2" },
-      { question: "정상적인 혈압의 범위는 어느 정도인가요? (수축기/이완기)", answer: "120/80" },
-      { question: "비타민 C가 풍부한 과일은 무엇일까요?", answer: "감" }
+      { question: "한국인의 하루 권장 소금 섭취량은 얼마인가요?", answer: "5g미만" },
+      { question: "한국 전통 발효 음식은 무엇인가요?", answer: "김치" },
+      { question: "하루에 필요한 물 섭취량은 얼마나 되나요?", answer: "2리터" }
     ];
     
-    // currentQuestion 객체: 현재 로드된 퀴즈 문제 저장
+    // 현재 퀴즈 문제를 보관할 변수
     let currentQuestion = null;
     
-    // ========================= 유틸리티 함수 =========================
-    // 배열의 랜덤 인덱스 값을 반환하는 함수
-    function getRandomIndex(array) {
-      return Math.floor(Math.random() * array.length);
-    }
-    
-    // ========================= 음식 추천 기능 =========================
-    const randomFoodBtn = document.getElementById("randomFoodBtn");
-    const foodOutput = document.getElementById("foodOutput");
-    const resetFoodBtn = document.getElementById("resetFoodBtn");
-    
-    randomFoodBtn.addEventListener("click", function () {
-      const randomFood = foods[getRandomIndex(foods)];
-      foodOutput.textContent = "추천 음식: " + randomFood;
-    });
-    
-    resetFoodBtn.addEventListener("click", function() {
-      foodOutput.textContent = "";
-    });
-    
-    // ========================= AI 감정 상담 기능 =========================
-    const aiCounselBtn = document.getElementById("aiCounselBtn");
-    const emotionSelect = document.getElementById("emotionSelect");
-    const aiOutput = document.getElementById("aiOutput");
-    const resetAiBtn = document.getElementById("resetAiBtn");
-    
-    aiCounselBtn.addEventListener("click", function () {
-      const selectedEmotion = emotionSelect.value;
-      if (!selectedEmotion) {
-        aiOutput.textContent = "먼저 감정을 선택해주세요.";
-        return;
-      }
-      const responses = aiResponses[selectedEmotion];
-      const randomResponse = responses[getRandomIndex(responses)];
-      aiOutput.textContent = randomResponse;
-    });
-    
-    resetAiBtn.addEventListener("click", function() {
-      aiOutput.textContent = "";
-      emotionSelect.selectedIndex = 0;
-    });
-    
-    // ========================= 건강 퀴즈 기능 =========================
-    const loadQuizBtn = document.getElementById("loadQuizBtn");
-    const quizDisplay = document.getElementById("quizDisplay");
-    const answerInput = document.getElementById("answerInput");
-    const checkAnswerBtn = document.getElementById("checkAnswerBtn");
-    const resultOutput = document.getElementById("resultOutput");
-    const resetQuizBtn = document.getElementById("resetQuizBtn");
-    const resetAnswerBtn = document.getElementById("resetAnswerBtn");
-    
-    loadQuizBtn.addEventListener("click", function () {
-      currentQuestion = quizQuestions[getRandomIndex(quizQuestions)];
-      quizDisplay.textContent = "문제: " + currentQuestion.question;
-      resultOutput.textContent = "";
-      answerInput.value = "";
-    });
-    
-    checkAnswerBtn.addEventListener("click", function () {
-      if (!currentQuestion) {
-        resultOutput.textContent = "먼저 문제를 불러오세요.";
-        return;
-      }
-      const userAnswer = answerInput.value.trim().toLowerCase();
-      const correctAnswer = currentQuestion.answer.trim().toLowerCase();
-      if (userAnswer === correctAnswer) {
-        resultOutput.textContent = "정답입니다!";
+    // 로그인 상태 관리
+    function updateUserStatus() {
+      const loggedIn = localStorage.getItem('loggedIn');
+      const statusText = document.getElementById('statusText');
+      const logoutBtn = document.getElementById('logoutBtn');
+      if(loggedIn === 'true') {
+        statusText.textContent = localStorage.getItem('username');
+        logoutBtn.style.display = 'inline-block';
       } else {
-        resultOutput.textContent = "오답입니다. 정답은: " + currentQuestion.answer;
-      }
-    });
-    
-    resetQuizBtn.addEventListener("click", function () {
-      currentQuestion = null;
-      quizDisplay.textContent = "";
-      resultOutput.textContent = "";
-    });
-    
-    resetAnswerBtn.addEventListener("click", function () {
-      answerInput.value = "";
-      resultOutput.textContent = "";
-    });
-    
-    // ========================= 다크 모드 토글 기능 =========================
-    const darkModeToggle = document.getElementById("darkModeToggle");
-    darkModeToggle.addEventListener("change", function() {
-      document.body.classList.toggle("dark", darkModeToggle.checked);
-    });
-    
-    // ========================= 알람 모드 (스텁 기능) =========================
-    // 알람 모드가 켜지면 버튼 클릭 시 경고음을 내도록 함 (간단한 예제)
-    const alarmModeToggle = document.getElementById("alarmModeToggle");
-    function playAlarm() {
-      if (alarmModeToggle.checked) {
-        // 간단한 beep 소리 (Web Audio API 사용)
-        const context = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = context.createOscillator();
-        oscillator.type = "sine";
-        oscillator.frequency.setValueAtTime(440, context.currentTime); // A4 note
-        oscillator.connect(context.destination);
-        oscillator.start();
-        oscillator.stop(context.currentTime + 0.2);
+        statusText.textContent = "로그인되지 않음";
+        logoutBtn.style.display = 'none';
       }
     }
-    // 모든 주요 버튼 클릭 시 알람 재생 (예: 음식 추천, AI 상담, 퀴즈 로드, 정답 확인)
-    const alarmButtons = [randomFoodBtn, aiCounselBtn, loadQuizBtn, checkAnswerBtn];
-    alarmButtons.forEach(btn => {
-      btn.addEventListener("click", playAlarm);
-    });
     
+    // 랜덤 인덱스 반환 함수
+    function randomIndex(arr) {
+      return Math.floor(Math.random() * arr.length);
+    }
+    
+    // 음식 추천 함수
+    function getRandomFood() {
+      const food = foods[randomIndex(foods)];
+      document.getElementById("foodOutput").innerText = food;
+    }
+    
+    // AI 상담 메시지 함수
+    function getRandomAIResponse() {
+      const emotion = document.getElementById("emotionSelect").value;
+      const messages = aiResponses[emotion];
+      if(messages && messages.length > 0) {
+        document.getElementById("aiOutput").innerText = messages[randomIndex(messages)];
+      } else {
+        document.getElementById("aiOutput").innerText = "해당 감정에 대한 상담 메시지가 없습니다.";
+      }
+    }
+    
+    // 건강 퀴즈 문제 불러오기
+    function loadQuizQuestion() {
+      currentQuestion = quizQuestions[randomIndex(quizQuestions)];
+      document.getElementById("quizQuestion").innerText = currentQuestion.question;
+      document.getElementById("resultOutput").innerText = "";
+      document.getElementById("quizAnswer").value = "";
+    }
+    
+    // 퀴즈 정답 확인 함수 (대소문자 구분 없이 공백 제거)
+    function checkQuizAnswer() {
+      const userAnswer = document.getElementById("quizAnswer").value.trim().toLowerCase();
+      const correctAnswer = currentQuestion.answer.trim().toLowerCase();
+      if(userAnswer === correctAnswer) {
+        document.getElementById("resultOutput").innerText = "정답입니다!";
+      } else {
+        document.getElementById("resultOutput").innerText = "오답입니다. 정답은: " + currentQuestion.answer;
+      }
+    }
+    
+    // 회원가입 함수 (간단한 로컬스토리지에 저장)
+    function signupUser() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      if(username === "" || password === "") {
+        document.getElementById("authMessage").innerText = "모든 필드를 입력하세요.";
+        return;
+      }
+      // 기존 계정 있는지 확인
+      if(localStorage.getItem('user_' + username)) {
+        document.getElementById("authMessage").innerText = "이미 존재하는 아이디입니다.";
+      } else {
+        localStorage.setItem('user_' + username, password);
+        document.getElementById("authMessage").innerText = "회원가입 성공! 이제 로그인하세요.";
+      }
+    }
+    
+    // 로그인 함수
+    function loginUser() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      if(username === "" || password === "") {
+        document.getElementById("authMessage").innerText = "모든 필드를 입력하세요.";
+        return;
+      }
+      const storedPassword = localStorage.getItem('user_' + username);
+      if(storedPassword && storedPassword === password) {
+        localStorage.setItem('loggedIn', 'true');
+        localStorage.setItem('username', username);
+        document.getElementById("authMessage").innerText = "로그인 성공!";
+        updateUserStatus();
+      } else {
+        document.getElementById("authMessage").innerText = "아이디 또는 비밀번호가 틀렸습니다.";
+      }
+    }
+    
+    // 로그아웃 함수
+    function logoutUser() {
+      localStorage.setItem('loggedIn', 'false');
+      localStorage.removeItem('username');
+      document.getElementById("authMessage").innerText = "로그아웃되었습니다.";
+      updateUserStatus();
+    }
+    
+    // 다크 모드 토글
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+    }
+    
+    // 알람 모드 토글 (헤더에 알람 효과 적용)
+    let isAlarmOn = false;
+    function toggleAlarmMode() {
+      isAlarmOn = !isAlarmOn;
+      const header = document.querySelector("header");
+      if(isAlarmOn) {
+        header.classList.add("alarm");
+      } else {
+        header.classList.remove("alarm");
+      }
+    }
+    
+    // 출력 초기화 기능
+    function resetOutputs() {
+      document.getElementById("foodOutput").innerText = "";
+      document.getElementById("aiOutput").innerText = "";
+      document.getElementById("quizQuestion").innerText = "";
+      document.getElementById("resultOutput").innerText = "";
+      document.getElementById("quizAnswer").value = "";
+    }
+    
+    // 화면 섹션 전환 함수 (SPA 방식)
+    function showSection(sectionId) {
+      const sections = document.querySelectorAll(".section");
+      sections.forEach(sec => {
+        if(sec.id === sectionId) {
+          sec.classList.add("active");
+        } else {
+          sec.classList.remove("active");
+        }
+      });
+    }
+    
+    // 이벤트 리스너 초기화 (DOM 컨텐츠 로드 후)
+    document.addEventListener("DOMContentLoaded", function() {
+      // 네비게이션 버튼 클릭시 해당 섹션 보여주기.
+      document.querySelectorAll("nav button").forEach(btn => {
+        btn.addEventListener("click", function() {
+          const target = this.getAttribute("data-target");
+          showSection(target);
+        });
+      });
+      
+      // 음식 추천 버튼 클릭 이벤트
+      document.getElementById("recommendFoodBtn").addEventListener("click", getRandomFood);
+      
+      // AI 상담 버튼 클릭 이벤트
+      document.getElementById("getCounselingBtn").addEventListener("click", getRandomAIResponse);
+      
+      // 건강 퀴즈 버튼 클릭 이벤트
+      document.getElementById("newQuestionBtn").addEventListener("click", loadQuizQuestion);
+      document.getElementById("submitAnswerBtn").addEventListener("click", checkQuizAnswer);
+      
+      // 로그인/회원가입 버튼 이벤트
+      document.getElementById("signupBtn").addEventListener("click", signupUser);
+      document.getElementById("loginBtn").addEventListener("click", loginUser);
+      document.getElementById("logoutBtn").addEventListener("click", logoutUser);
+      
+      // 설정 버튼 이벤트
+      document.getElementById("toggleDarkModeBtn").addEventListener("click", toggleDarkMode);
+      document.getElementById("toggleAlarmModeBtn").addEventListener("click", toggleAlarmMode);
+      document.getElementById("resetOutputsBtn").addEventListener("click", resetOutputs);
+      
+      updateUserStatus();
+    });
   </script>
 </body>
 </html>
-```
-
