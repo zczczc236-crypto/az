@@ -495,7 +495,7 @@ const app = {
         if(kws.some(k => txt.includes(k))) matches.push(cat);
       }
       // pick highest priority if multiple
-      const priority = ['suicide','stress','depression','insomnia','hunger','fatigue','greeting','general'];
+      const priority = ['self_harm','suicide','stress','depression','insomnia','hunger','fatigue','greeting','general'];
       const found = priority.find(p => matches.includes(p));
       let empathy = '';
       let solution = '';
@@ -636,11 +636,13 @@ const app = {
         const base = baseList[idx % baseList.length] || ('키워드'+idx);
         const variant = base + (Math.random() < 0.5 ? '' : suffixes[Math.floor(Math.random()*suffixes.length)]) + (Math.random() < 0.08 ? Math.floor(Math.random()*30) : '');
         // avoid duplicates
-        if(!baseList.includes(variant)) baseList.push(variant);
-        total++;
+        if(!baseList.includes(variant)) {
+          baseList.push(variant);
+          total++;
+        }
         idx++;
         // safety break
-        if(idx>minKeywords*3) break;
+        if(idx>minKeywords*5) break;
       }
 
       // ensure important dangerous tokens present in a small special category for immediate detection
